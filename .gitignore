@@ -1,0 +1,24 @@
+# Fichiers sensibles
+.env
+.env.local
+.env.development
+.env.production
+
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build frontend
+/frontend/build
+/frontend/dist
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

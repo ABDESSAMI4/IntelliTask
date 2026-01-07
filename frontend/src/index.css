@@ -1,0 +1,40 @@
+/* Mode sombre global */
+
+html.dark {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+html.dark .bg-white {
+    background-color: #1e293b !important;
+    color: #e2e8f0;
+}
+
+html.dark .bg-light {
+    background-color: #334155 !important;
+}
+
+html.dark .text-dark {
+    color: #e2e8f0 !important;
+}
+
+html.dark .card {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+html.dark .form-control {
+    background-color: #334155;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+html.dark .btn-primary {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+html.dark .table {
+    --bs-table-bg: #1e293b;
+    --bs-table-color: #e2e8f0;
+}

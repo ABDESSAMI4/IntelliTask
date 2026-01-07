@@ -1,0 +1,38 @@
+{
+    "name": "tp6_mern",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^1.13.2",
+        "bcrypt": "^6.0.0",
+        "cloudinary": "^2.8.0",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^4.22.1",
+        "express-validator": "^7.3.1",
+        "helmet": "^8.1.0",
+        "jsonwebtoken": "^9.0.3",
+        "mongoose": "^8.21.0",
+        "morgan": "^1.10.1",
+        "multer": "^1.4.5-lts.1",
+        "nodemailer": "^7.0.12",
+        "openai": "^6.15.0",
+        "resend": "^6.6.0",
+        "socket.io": "^4.8.3"
+    },
+    "devDependencies": {
+        "eslint": "^9.39.2",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.4",
+        "nodemon": "^3.1.11",
+        "prettier": "^3.7.4"
+    }
+}
