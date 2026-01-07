@@ -1,10 +1,15 @@
-// src/App.js - Version finale complète, corrigée et fonctionnelle (ESLint OK)
+// src/App.js - Version finale corrigée, sans erreur de compilation
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+    useLocation,
+} from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify'; // ← toast importé ici
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import io from 'socket.io-client';
 
 // Pages
 import Login from './pages/Login';
@@ -23,26 +28,25 @@ import VehicleRequestsAdmin from './pages/VehicleRequestsAdmin';
 
 // Composants
 import Header from './components/layout/Header';
-import FloatingChatButton from './components/FloatingChatButton';
+// import FloatingChatButton from './components/layout/FloatingChatButton'; // ← Commenté : fichier non trouvé
 
 // Utils
 import ProtectedRoute from './utils/ProtectedRoute';
 
-// Connexion Socket.io globale
-const socket = io('http://localhost:5000', {
-    transports: ['websocket'],
-    autoConnect: true,
-});
+// Socket.io
+import socket from './socket'; // ← src/socket.js doit exister
 
-// Layout pour Header et Chat flottant
+// Layout pour Header (sans FloatingChatButton pour l'instant)
 const MainLayout = ({ children }) => {
     const location = useLocation();
-    const noHeaderRoutes = ['/login', '/register'];
-    const noChatRoutes = ['/login', '/register'];
+    const noHeaderRoutes = ['/login', '/register', '/about'];
+
+    const showHeader = !noHeaderRoutes.includes(location.pathname);
 
     return ( <
-        >
-        {!noHeaderRoutes.includes(location.pathname) && < Header / > } { children } {!noChatRoutes.includes(location.pathname) && < FloatingChatButton / > } <
+        > { showHeader && < Header / > } <
+        main className = "flex-grow-1 pt-5" > { children } <
+        /main> <
         />
     );
 };
@@ -62,7 +66,7 @@ function App() {
             }
         }
 
-        // Notification quand une demande est acceptée/refusée (pour l'auditeur)
+        // Notification demande véhicule acceptée/refusée
         socket.on('vehicleRequestUpdate', (data) => {
             if (data.status === 'acceptée') {
                 toast.success(data.message || '✅ Votre demande de véhicule a été acceptée !');
@@ -71,10 +75,10 @@ function App() {
             }
         });
 
-        // Notification pour admin : nouvelle demande arrivée
+        // Nouvelle demande pour admin
         socket.on('newVehicleRequest', (data) => {
             if (window.location.pathname.includes('/admin')) {
-                toast.info(`📥 Nouvelle demande : ${data.vehicle || 'un véhicule'} (${data.user || 'un auditeur'})`);
+                toast.info(`📥 Nouvelle demande : ${data.vehicle || 'un véhicule'} par ${data.user || 'un auditeur'}`);
             }
         });
 
@@ -92,15 +96,6 @@ function App() {
             <
             MainLayout >
             <
-            main className = "flex-grow-1 pt-5" >
-            <
-            ToastContainer position = "top-right"
-            autoClose = { 5000 }
-            hideProgressBar = { false }
-            newestOnTop closeOnClick pauseOnHover theme = "light" /
-            >
-
-            <
             Routes > { /* Routes publiques */ } <
             Route path = "/login"
             element = { < Login / > }
@@ -114,8 +109,7 @@ function App() {
 
             { /* Routes protégées - tous les utilisateurs */ } <
             Route element = { < ProtectedRoute allowedRoles = {
-                    ['user', 'admin', 'superAdmin']
-                }
+                    ['user', 'admin', 'superAdmin'] }
                 />}> <
                 Route path = "/dashboard"
                 element = { < DashboardUser / > }
@@ -125,13 +119,12 @@ function App() {
                 /> <
                 Route path = "/request-vehicle"
                 element = { < RequestVehicle / > }
-                /> < /
-                Route >
+                /> <
+                /Route>
 
                 { /* Routes admin / superAdmin */ } <
                 Route element = { < ProtectedRoute allowedRoles = {
-                        ['admin', 'superAdmin']
-                    }
+                        ['admin', 'superAdmin'] }
                     />}> <
                     Route path = "/admin/dashboard"
                     element = { < DashboardAdmin / > }
@@ -153,14 +146,13 @@ function App() {
                     /> <
                     Route path = "/admin/vehicle-requests"
                     element = { < VehicleRequestsAdmin / > }
-                    /> < /
-                    Route >
+                    /> <
+                    /Route>
 
                     { /* Accueil */ } <
                     Route path = "/"
                     element = { < Navigate to = "/login"
-                        replace / >
-                    }
+                        replace / > }
                     />
 
                     { /* 404 */ } <
@@ -174,21 +166,34 @@ function App() {
                         a href = "/login"
                         className = "btn btn-primary btn-lg" >
                         Retour à la connexion <
-                        /a> < /
-                        div >
+                        /a> <
+                        /div>
                     }
-                    /> < /
-                    Routes > <
-                    /main> < /
-                    MainLayout >
+                    /> <
+                    /Routes> <
+                    /MainLayout>
 
-                    <
+                    { /* Footer */ } <
                     footer className = "bg-dark text-white text-center py-4 mt-auto" >
                     <
-                    small > ©2026 IntelliTask - Gestion intelligente des tâches et du parc automobile < /small> < /
-                    footer > <
-                    /div> < /
-                    Router >
+                    small > ©2026 IntelliTask - Gestion intelligente des tâches et du parc automobile < /small> <
+                    /footer>
+
+                    { /* ToastContainer GLOBAL */ } <
+                    ToastContainer
+                    position = "top-right"
+                    autoClose = { 5000 }
+                    hideProgressBar = { false }
+                    newestOnTop
+                    closeOnClick
+                    pauseOnHover
+                    pauseOnFocusLoss
+                    draggable
+                    theme = "light" /
+                    >
+                    <
+                    /div> <
+                    /Router>
                 );
             }
 
