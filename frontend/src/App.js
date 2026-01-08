@@ -44,10 +44,10 @@ const MainLayout = ({ children }) => {
     const showHeader = !noHeaderRoutes.includes(location.pathname);
 
     return ( <
-        > { showHeader && < Header / > } <
+        >
+        { showHeader && < Header / > } <
         main className = "flex-grow-1 pt-5" > { children } <
-        /main> <
-        />
+        /main> < / >
     );
 };
 
@@ -109,7 +109,8 @@ function App() {
 
             { /* Routes protégées - tous les utilisateurs */ } <
             Route element = { < ProtectedRoute allowedRoles = {
-                    ['user', 'admin', 'superAdmin'] }
+                    ['user', 'admin', 'superAdmin']
+                }
                 />}> <
                 Route path = "/dashboard"
                 element = { < DashboardUser / > }
@@ -119,12 +120,13 @@ function App() {
                 /> <
                 Route path = "/request-vehicle"
                 element = { < RequestVehicle / > }
-                /> <
-                /Route>
+                /> < /
+                Route >
 
                 { /* Routes admin / superAdmin */ } <
                 Route element = { < ProtectedRoute allowedRoles = {
-                        ['admin', 'superAdmin'] }
+                        ['admin', 'superAdmin']
+                    }
                     />}> <
                     Route path = "/admin/dashboard"
                     element = { < DashboardAdmin / > }
@@ -146,13 +148,14 @@ function App() {
                     /> <
                     Route path = "/admin/vehicle-requests"
                     element = { < VehicleRequestsAdmin / > }
-                    /> <
-                    /Route>
+                    /> < /
+                    Route >
 
                     { /* Accueil */ } <
                     Route path = "/"
                     element = { < Navigate to = "/login"
-                        replace / > }
+                        replace / >
+                    }
                     />
 
                     { /* 404 */ } <
@@ -166,18 +169,15 @@ function App() {
                         a href = "/login"
                         className = "btn btn-primary btn-lg" >
                         Retour à la connexion <
-                        /a> <
-                        /div>
+                        /a> < /
+                        div >
                     }
-                    /> <
-                    /Routes> <
+                    /> < /
+                    Routes > <
                     /MainLayout>
 
-                    { /* Footer */ } <
-                    footer className = "bg-dark text-white text-center py-4 mt-auto" >
-                    <
-                    small > ©2026 IntelliTask - Gestion intelligente des tâches et du parc automobile < /small> <
-                    /footer>
+                    /
+
 
                     { /* ToastContainer GLOBAL */ } <
                     ToastContainer
@@ -192,8 +192,8 @@ function App() {
                     theme = "light" /
                     >
                     <
-                    /div> <
-                    /Router>
+                    /div> < /
+                    Router >
                 );
             }
 

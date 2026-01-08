@@ -1,25 +1,18 @@
-// src/pages/Login.jsx - Version finale professionnelle avec NetworkGraph
+// src/pages/Login.jsx
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import API from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-
-// Assets
-import background from '../assets/background.jpg';
-import logo from '../assets/Log.jpg';
-
-// Graph animé de nœuds connectés
-import NetworkGraph from '../components/NetworkGraph';
-
-
+import background from '../assets/background.jpg'; // Image de ville
+import logo from '../assets/Log.jpg'; // Ton logo
+import ParticlesBackground from '../components/ParticlesBackground';
 
 const Login = () => {
   const [showModal, setShowModal] = useState(false);
   const [showSolutions, setShowSolutions] = useState(false);
   const [showContact, setShowContact] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -39,12 +32,11 @@ const Login = () => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      toast.error('Email et mot de passe sont obligatoires');
+      toast.error('Email et mot de passe obligatoires');
       return;
     }
-
     if (!isLogin && !formData.name) {
-      toast.error('Le nom est obligatoire pour l\'inscription');
+      toast.error('Nom obligatoire pour l\'inscription');
       return;
     }
 
@@ -52,86 +44,87 @@ const Login = () => {
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
       const res = await API.post(endpoint, formData);
 
-      toast.success(isLogin ? 'Connexion réussie ! Bienvenue 👋' : 'Compte créé avec succès !');
+      toast.success(isLogin ? 'Connexion réussie ! Bienvenue !' : 'Inscription réussie !');
+      login(res.data.token);
 
-      if (res.data.token) {
-        login(res.data.token, res.data.user);
-      }
-
-      // Redirection selon rôle
       if (res.data.role === 'superAdmin' || res.data.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/dashboard');
       }
-
       setShowModal(false);
     } catch (err) {
-      const msg = err.response?.data?.message || 'Erreur lors de la connexion';
+      const msg = err.response?.data?.message || 'Erreur de connexion';
       toast.error(msg);
     }
   };
 
   return (
     <>
-      {/* LANDING PAGE – Fond ville + Graph animé de nœuds connectés */}
+      {/* LANDING PAGE - Fond ville + particules */}
       <div
-        className="position-relative d-flex align-items-center justify-content-center min-vh-100 overflow-hidden"
+        className="position-relative d-flex align-items-center justify-content-center overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${background})`,
+          backgroundImage: `url(${background})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
+          backgroundRepeat: 'no-repeat',
+          minHeight: '100vh',
+          width: '100vw'
         }}
       >
-        {/* GRAPHE DE NŒUDS CONNECTÉS – UNIQUEMENT SUR CETTE SECTION */}
-        <NetworkGraph />
+        {/* Overlay sombre */}
+        <div
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1 }}
+        />
 
-        {/* Logo + Titre en haut gauche */}
+        {/* Animation particules nœuds/lignes */}
+        <ParticlesBackground />
+
+        {/* Logo + Titre en haut à gauche */}
         <div className="position-absolute top-0 start-0 p-4 p-lg-5" style={{ zIndex: 10 }}>
           <div className="d-flex align-items-center">
             <img
               src={logo}
-              alt="IntelliTask"
-              className="rounded-circle shadow-lg border border-4 border-white me-3"
+              alt="IntelliTask Logo"
+              className="me-3 shadow-lg rounded-circle"
               style={{ width: '80px', height: '80px', objectFit: 'cover' }}
             />
             <div>
               <h2 className="text-white fw-bold mb-0">IntelliTask</h2>
-              <p className="text-white opacity-75 mb-0 small">Gestion intelligente</p>
+              <small className="text-white opacity-75">Gestion intelligente</small>
             </div>
           </div>
         </div>
 
-        {/* Bouton Connexion en haut droite */}
+        {/* Bouton "Se connecter" en haut à droite */}
         <div className="position-absolute top-0 end-0 p-4 p-lg-5" style={{ zIndex: 10 }}>
           <button
             onClick={() => setShowModal(true)}
-            className="btn btn-outline-light btn-lg px-5 py-3 rounded-pill shadow-lg fw-bold border-3 transition-all hover-bg-white hover-text-primary"
+            className="btn btn-outline-light btn-lg shadow-lg px-5 fw-bold rounded-pill border-2"
           >
             Se connecter
           </button>
         </div>
 
-        {/* Contenu centré */}
-        <div className="text-center text-white px-4" style={{ zIndex: 2 }}>
-          <h1 className="display-3 display-lg-1 fw-bold mb-4 text-shadow">
-            IntelliTask
-          </h1>
-          <p className="fs-2 fs-lg-1 mb-5 opacity-90 text-shadow">
+        {/* Titre + slogan + boutons centré */}
+        <div className="text-center text-white position-relative" style={{ zIndex: 2 }}>
+          <h1 className="display-2 display-md-1 fw-bold mb-4">IntelliTask</h1>
+          <p className="fs-3 fs-md-2 opacity-90 mb-5">
             Le futur de la gestion des tâches à portée de main !
           </p>
 
-          <div className="d-flex flex-column flex-md-row gap-4 justify-content-center">
+          <div className="d-flex flex-column flex-md-row justify-content-center gap-4">
             <button
               onClick={() => setShowSolutions(!showSolutions)}
-              className="btn btn-info btn-lg px-5 py-3 rounded-pill shadow-lg fw-bold transition-all hover-shadow"
+              className="btn btn-info btn-lg px-5 rounded-pill shadow-lg fw-bold text-white"
             >
               Nos solutions →
             </button>
             <button
               onClick={() => setShowContact(!showContact)}
-              className="btn btn-outline-light btn-lg px-5 py-3 rounded-pill shadow-lg fw-bold transition-all hover-bg-white hover-text-primary"
+              className="btn btn-outline-light btn-lg px-5 rounded-pill shadow-lg fw-bold"
             >
               Nous contacter →
             </button>
@@ -139,22 +132,21 @@ const Login = () => {
         </div>
       </div>
 
-      {/* SECTION NOS SOLUTIONS – SANS GRAPH */}
+   {/* SECTION NOS SOLUTIONS */}
       {showSolutions && (
         <section className="py-5 bg-white">
           <div className="container py-5">
             <div className="row align-items-center g-5">
               <div className="col-lg-6">
                 <h2 className="display-5 fw-bold text-primary mb-4">
-                  Nos solutions à travers le monde
+                  Nos solutions à travers le Maroc
                 </h2>
                 <p className="lead text-dark mb-4">
-                  IntelliTask est une plateforme intelligente conçue pour les équipes modernes. 
-                  Nous aidons les entreprises, institutions et équipes à organiser, assigner et suivre les tâches avec une IA intégrée.
+                  IntelliTask est une plateforme intelligente conçue pour les institutions marocaines.
                 </p>
                 <p className="text-dark mb-5">
-                  Présente dans plusieurs pays, notre solution offre : assignation automatique IA, notifications en temps réel, 
-                  historique complet, export PDF/Excel, et tableaux de bord analytiques.
+                  Déployée dans les principales villes du Royaume, notre solution offre une gestion optimisée des tâches, 
+                  assignation automatique par IA, notifications en temps réel et historique complet.
                 </p>
                 <p className="text-primary fw-bold fs-4">
                   Plus de 100 utilisateurs nous font confiance.
@@ -169,11 +161,11 @@ const Login = () => {
                   <div className="bg-white rounded-3 p-4 shadow">
                     <img
                       src="https://images.unsplash.com/photo-1521295121783-8a321d551ad2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                      alt="Carte du Maroc avec villes IntelliTask"
+                      alt="Carte complète du Maroc - IntelliTask"
                       className="img-fluid rounded shadow"
                     />
                     <p className="mt-3 text-muted small">
-                      IntelliTask est déployé dans les principales villes du Royaume pour une gestion optimisée des tâches administratives et éducatives.
+                      IntelliTask est déployé dans tout le Royaume, du Nord au Sud.
                     </p>
                   </div>
                 </div>
@@ -183,7 +175,7 @@ const Login = () => {
         </section>
       )}
 
-      {/* SECTION CONTACT – SANS GRAPH */}
+   {/* SECTION CONTACT */}
       {showContact && (
         <footer className="bg-dark text-white py-5">
           <div className="container">
@@ -220,22 +212,16 @@ const Login = () => {
           </div>
         </footer>
       )}
-
       {/* MODAL CONNEXION / INSCRIPTION */}
       {showModal && (
         <div
-          className="position-fixed inset-0 d-flex align-items-center justify-content-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1050 }}
-          onClick={() => setShowModal(false)}
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 1000 }}
         >
-          <div
-            className="bg-white rounded-4 shadow-2xl p-5"
-            style={{ maxWidth: '520px', width: '95%' }}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="bg-white rounded-4 shadow-lg p-5" style={{ maxWidth: '550px', width: '90%' }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="fw-bold text-primary mb-0">
-                {isLogin ? 'Connexion' : 'Créer un compte'}
+                {isLogin ? 'Connexion' : 'Inscription'}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -247,12 +233,12 @@ const Login = () => {
             <form onSubmit={handleSubmit}>
               {!isLogin && (
                 <>
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <label className="form-label fw-bold">Nom complet</label>
                     <input
                       type="text"
                       name="name"
-                      className="form-control form-control-lg rounded-pill"
+                      className="form-control form-control-lg"
                       placeholder="Ex: Ahmed Benali"
                       value={formData.name}
                       onChange={handleChange}
@@ -260,12 +246,12 @@ const Login = () => {
                     />
                   </div>
 
-                  <div className="row g-3 mb-4">
+                  <div className="row mb-3">
                     <div className="col-md-6">
                       <label className="form-label fw-bold">Spécialité</label>
                       <select
                         name="specialty"
-                        className="form-select form-select-lg rounded-pill"
+                        className="form-select form-select-lg"
                         value={formData.specialty}
                         onChange={handleChange}
                       >
@@ -281,7 +267,7 @@ const Login = () => {
                       <label className="form-label fw-bold">Grade</label>
                       <select
                         name="grade"
-                        className="form-select form-select-lg rounded-pill"
+                        className="form-select form-select-lg"
                         value={formData.grade}
                         onChange={handleChange}
                       >
@@ -295,13 +281,13 @@ const Login = () => {
                 </>
               )}
 
-              <div className="mb-4">
-                <label className="form-label fw-bold">Email institutionnel</label>
+              <div className="mb-3">
+                <label className="form-label fw-bold">Email</label>
                 <input
                   type="email"
                   name="email"
-                  className="form-control form-control-lg rounded-pill"
-                  placeholder="nom@edu.ac.ma"
+                  className="form-control form-control-lg"
+                  placeholder="exemple@intellitask.com"
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -313,7 +299,7 @@ const Login = () => {
                 <input
                   type="password"
                   name="password"
-                  className="form-control form-control-lg rounded-pill"
+                  className="form-control form-control-lg"
                   placeholder="Minimum 6 caractères"
                   value={formData.password}
                   onChange={handleChange}
@@ -323,7 +309,7 @@ const Login = () => {
 
               <button
                 type="submit"
-                className="btn btn-primary btn-lg w-100 rounded-pill shadow-lg fw-bold py-3 mb-3 transition-all hover-shadow"
+                className="btn btn-primary btn-lg w-100 shadow rounded-pill mb-3"
               >
                 {isLogin ? 'Se connecter' : 'Créer mon compte'}
               </button>
@@ -331,10 +317,10 @@ const Login = () => {
               <div className="text-center">
                 <button
                   type="button"
-                  className="btn btn-link text-primary fw-bold"
+                  className="btn btn-link text-decoration-none fw-bold"
                   onClick={() => setIsLogin(!isLogin)}
                 >
-                  {isLogin ? 'Pas de compte ? S\'inscrire' : 'Déjà inscrit ? Se connecter'}
+                  {isLogin ? 'Pas de compte ? S\'inscrire ici' : 'Déjà inscrit ? Se connecter'}
                 </button>
               </div>
             </form>

@@ -107,11 +107,11 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
                 📅 Mon Historique
               </Link>
             </li>
-            <li className="nav-item">
-  <Link to="/request-vehicle" className="nav-link">
-    🚗 Demander un véhicule
-  </Link>
-</li>
+            <li className="mb-3">
+              <Link to="/request-vehicle" className="nav-link">
+                🚗 Demander un véhicule
+             </Link>
+          </li>
           </ul>
         </nav>
 
