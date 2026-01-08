@@ -220,7 +220,7 @@ const Login = () => {
             <div className="row text-center text-md-start g-5">
               <div className="col-md-4">
                 <h5 className="fw-bold mb-4">{t('contact')}</h5>
-                <p className="mb-2">📞 +212 (0) 625 37 88 837</p>
+                <p className="mb-2">📞 +212 (0)6 24 04 60 76</p>
                 <p>✉️ a.aglagal@edu.ac.ma</p>
               </div>
               <div className="col-md-4">
@@ -233,7 +233,7 @@ const Login = () => {
                 <div className="d-flex justify-content-center justify-content-md-start gap-4 fs-3">
                   <a href="#" className="text-white transition-all hover-text-info">Facebook</a>
                   <a href="#" className="text-white transition-all hover-text-info">Instagram</a>
-                  <a href="#" className="text-white transition-all hover-text-info">Twitter</a>
+                
                   <a href="#" className="text-white transition-all hover-text-info">LinkedIn</a>
                 </div>
               </div>

@@ -17,13 +17,13 @@ body {
 }
 
 
-/* Plein écran pour la page login (et autres pages si besoin) */
+/* Plein écran pour la page login */
 
 .min-h-screen,
 .login-fullscreen {
     min-height: 100vh;
     min-height: 100dvh;
-    /* Support parfait sur iOS Safari */
+    /* Crucial pour iOS Safari */
     margin: 0;
     padding: 0;
 }
@@ -37,46 +37,136 @@ body.login-page {
 }
 
 
-/* Mode sombre global (inchangé) */
+/* ==================== DARK MODE GLOBAL ==================== */
 
 html.dark {
     background-color: #0f172a;
     color: #e2e8f0;
 }
 
+
+/* Fond blanc → gris très foncé */
+
 html.dark .bg-white {
     background-color: #1e293b !important;
-    color: #e2e8f0;
+    color: #e2e8f0 !important;
 }
+
+
+/* Fond light → gris foncé */
 
 html.dark .bg-light {
     background-color: #334155 !important;
 }
 
-html.dark .text-dark {
+
+/* TOUTES LES TEXTES NOIRES DEVIENNENT BLANCHES EN DARK MODE */
+
+html.dark .text-dark,
+html.dark .text-black,
+html.dark .text-body {
     color: #e2e8f0 !important;
 }
 
-html.dark .card {
-    background-color: #1e293b;
-    border-color: #334155;
+
+/* Textes muted (gris clair) */
+
+html.dark .text-muted {
+    color: #94a3b8 !important;
 }
 
-html.dark .form-control {
-    background-color: #334155;
-    border-color: #475569;
-    color: #e2e8f0;
+
+/* Liens */
+
+html.dark a {
+    color: #60a5fa !important;
 }
+
+html.dark a:hover {
+    color: #93bbfc !important;
+}
+
+
+/* Cards */
+
+html.dark .card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+
+/* Formulaires */
+
+html.dark .form-control,
+html.dark .form-select {
+    background-color: #334155 !important;
+    border-color: #475569 !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark .form-control::placeholder,
+html.dark .form-select::placeholder {
+    color: #94a3b8 !important;
+}
+
+
+/* Boutons primaires */
 
 html.dark .btn-primary {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
 }
+
+html.dark .btn-outline-light {
+    color: #e2e8f0 !important;
+    border-color: #e2e8f0 !important;
+}
+
+html.dark .btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+
+/* Tableaux */
 
 html.dark .table {
     --bs-table-bg: #1e293b;
     --bs-table-color: #e2e8f0;
+    --bs-table-border-color: #334155;
 }
+
+html.dark .table th,
+html.dark .table td {
+    border-color: #334155 !important;
+}
+
+
+/* Navbar primaire (bleu) en dark mode */
+
+html.dark .navbar-dark.bg-primary {
+    background-color: #1d4ed8 !important;
+    /* Bleu plus foncé pour contraste */
+}
+
+
+/* Modal */
+
+html.dark .modal-content {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+
+
+/* Ombres plus douces en dark */
+
+html.dark .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6) !important;
+}
+
+
+/* ==================== FIN DARK MODE ==================== */
 
 
 /* Transitions et hovers */
