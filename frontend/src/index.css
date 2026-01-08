@@ -1,4 +1,43 @@
-/* Mode sombre global */
+/* Reset complet – élimine tous les espaces indésirables */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+
+/* Plein écran pour la page login (et autres pages si besoin) */
+
+.min-h-screen,
+.login-fullscreen {
+    min-height: 100vh;
+    min-height: 100dvh;
+    /* Support parfait sur iOS Safari */
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Supprime le décalage sidebar sur la page login */
+
+body.login-page {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+
+/* Mode sombre global (inchangé) */
 
 html.dark {
     background-color: #0f172a;
@@ -40,7 +79,7 @@ html.dark .table {
 }
 
 
-/* Transition douce */
+/* Transitions et hovers */
 
 .transition-all {
     transition: all 0.3s ease;
@@ -59,17 +98,14 @@ html.dark .table {
 }
 
 
-/* Contenu décalé quand sidebar visible */
+/* Sidebar décalage uniquement sur les pages connectées */
 
-body {
+body.logged-in {
     margin-left: 280px;
 }
 
-
-/* Mobile : pas de décalage */
-
 @media (max-width: 991px) {
-    body {
+    body.logged-in {
         margin-left: 0 !important;
     }
 }

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
   const isAdmin = user?.role === 'admin' || user?.role === 'superAdmin';
+  const isUser = user?.role === 'user'; // ← Pour afficher uniquement aux users
 
   return (
     <>
@@ -15,11 +16,11 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
         />
       )}
 
-      {/* Sidebar – fond bleu, glisse correctement */}
+      {/* Sidebar – fond bleu, largeur petite */}
       <div
         className="position-fixed top-0 start-0 h-100 bg-primary text-white shadow-lg d-flex flex-column"
         style={{
-          width: '280px',
+          width: '200px',
           zIndex: 999,
           transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
           transition: 'transform 0.3s ease-in-out',
@@ -36,6 +37,7 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
 
         <nav className="flex-grow-1 p-3 overflow-auto">
           <ul className="list-unstyled mb-0">
+            {/* Menu Admin / SuperAdmin */}
             {isAdmin ? (
               <>
                 <li className="mb-3">
@@ -44,7 +46,7 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
                     className="text-white text-decoration-none d-block py-3 px-4 rounded hover-bg-primary-dark"
                     onClick={toggleSidebar}
                   >
-                    📊 Administration du tableau de bord
+                    📊 Dashboard Admin
                   </Link>
                 </li>
                 <li className="mb-3">
@@ -74,8 +76,7 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
                     📜 Historique Global
                   </Link>
                 </li>
-                
-                { <li className="mb-3">
+                <li className="mb-3">
                   <Link
                     to="/admin/vehicles"
                     className="text-white text-decoration-none d-block py-3 px-4 rounded hover-bg-primary-dark transition-all"
@@ -83,10 +84,10 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
                   >
                     🚗 Véhicules
                   </Link>
-                </li> }
-                
+                </li>
               </>
             ) : (
+              /* Menu Utilisateur normal */
               <li className="mb-3">
                 <Link
                   to="/dashboard"
@@ -98,23 +99,33 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
               </li>
             )}
 
+            {/* Historique – visible pour tous */}
             <li className="mb-3">
               <Link
                 to="/history"
                 className="text-white text-decoration-none d-block py-3 px-4 rounded hover-bg-primary-dark"
                 onClick={toggleSidebar}
               >
-                📅 Mon Historique
+                ⏱ Mon Historique
               </Link>
             </li>
-            <li className="mb-3">
-              <Link to="/request-vehicle" className="nav-link">
-                🚗 Demander un véhicule
-             </Link>
-          </li>
+
+            {/* Demander un véhicule – UNIQUEMENT pour les users normaux */}
+            {isUser && (
+              <li className="mb-3">
+                <Link
+                  to="/request-vehicle"
+                  className="text-white text-decoration-none d-block py-3 px-4 rounded hover-bg-primary-dark"
+                  onClick={toggleSidebar}
+                >
+                  🚗 Demander un véhicule
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
 
+        {/* Profil + Déconnexion en bas */}
         <div className="p-4 border-top border-light border-opacity-25">
           <div className="d-flex align-items-center mb-3">
             <div

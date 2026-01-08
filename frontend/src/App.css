@@ -1,38 +1,109 @@
-.App {
-    text-align: center;
+/* App.css - Version finale propre et optimisée */
+
+
+/* Suppression du code React par défaut inutile */
+
+.App,
+.App-header,
+.App-logo,
+.App-link,
+@keyframes App-logo-spin {
+    display: none;
+    /* Plus besoin pour ton projet */
 }
 
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+
+/* ------------------------------------------------- */
+
+
+/* Sidebar moderne – style premium (bleu ou noir selon besoin) */
+
+.transition-all {
+    transition: all 0.35s ease;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.hover-opacity-100:hover {
+    opacity: 1 !important;
 }
 
-.App-header {
-    background-color: #282c34;
+.hover-bg-white:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.hover-text-primary:hover {
+    color: #0d6efd !important;
+}
+
+.hover-text-white:hover {
+    color: #ffffff !important;
+}
+
+.hover-text-dark:hover {
+    color: #212529 !important;
+}
+
+.focus-opacity-100:focus {
+    opacity: 1 !important;
+}
+
+
+/* Placeholder input recherche dans sidebar */
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+
+/* ------------------------------------------------- */
+
+
+/* PLEIN ÉCRAN POUR PAGE LOGIN – AUCUN ESPACE BLANC */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+
+/* Classe à ajouter sur la div principale de Login.jsx */
+
+.login-fullscreen {
     min-height: 100vh;
+    min-height: 100dvh;
+    /* Crucial pour iOS Safari – plein écran mobile */
+    width: 100vw;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
 }
 
-.App-link {
-    color: #61dafb;
+
+/* Supprime le décalage sidebar sur la page login */
+
+body.login-page,
+body:has(.login-fullscreen) {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+
+/* Optionnel : si tu veux un fond sombre global en dehors du login */
+
+body:not(.login-page) {
+    background-color: #f8f9fa;
+}
+
+
+/* ------------------------------------------------- */
+
+
+/* Autres utilitaires (si tu les utilises ailleurs) */
+
+.hover-shadow:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }

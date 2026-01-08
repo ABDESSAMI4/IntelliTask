@@ -1,4 +1,4 @@
-// src/App.js - Version finale corrigée, sans erreur de compilation
+// src/App.js - Version finale corrigée et professionnelle
 import { useEffect } from 'react';
 import {
     BrowserRouter as Router,
@@ -7,7 +7,7 @@ import {
     Navigate,
     useLocation,
 } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify'; // ← toast importé ici
+import { ToastContainer, toast } from 'react-toastify'; // ← toast correctement importé
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -28,31 +28,35 @@ import VehicleRequestsAdmin from './pages/VehicleRequestsAdmin';
 
 // Composants
 import Header from './components/layout/Header';
-// import FloatingChatButton from './components/layout/FloatingChatButton'; // ← Commenté : fichier non trouvé
 
 // Utils
 import ProtectedRoute from './utils/ProtectedRoute';
 
 // Socket.io
-import socket from './socket'; // ← src/socket.js doit exister
+import socket from './socket';
 
-// Layout pour Header (sans FloatingChatButton pour l'instant)
-const MainLayout = ({ children }) => {
+const AppLayout = ({ children }) => {
     const location = useLocation();
-    const noHeaderRoutes = ['/login', '/register', '/about'];
+    const noLayoutRoutes = ['/login', '/register', '/about'];
 
-    const showHeader = !noHeaderRoutes.includes(location.pathname);
+    const isNoLayout = noLayoutRoutes.includes(location.pathname);
+
+    if (isNoLayout) {
+        return < > { children } < />;
+    }
 
     return ( <
-        >
-        { showHeader && < Header / > } <
+        div className = "d-flex flex-column min-vh-100 bg-light" >
+        <
+        Header / >
+        <
         main className = "flex-grow-1 pt-5" > { children } <
-        /main> < / >
+        /main> <
+        /div>
     );
 };
 
 function App() {
-    // Socket.io : notifications en temps réel
     useEffect(() => {
         const userStr = localStorage.getItem('user');
         if (userStr) {
@@ -66,7 +70,6 @@ function App() {
             }
         }
 
-        // Notification demande véhicule acceptée/refusée
         socket.on('vehicleRequestUpdate', (data) => {
             if (data.status === 'acceptée') {
                 toast.success(data.message || '✅ Votre demande de véhicule a été acceptée !');
@@ -75,14 +78,12 @@ function App() {
             }
         });
 
-        // Nouvelle demande pour admin
         socket.on('newVehicleRequest', (data) => {
             if (window.location.pathname.includes('/admin')) {
                 toast.info(`📥 Nouvelle demande : ${data.vehicle || 'un véhicule'} par ${data.user || 'un auditeur'}`);
             }
         });
 
-        // Cleanup
         return () => {
             socket.off('vehicleRequestUpdate');
             socket.off('newVehicleRequest');
@@ -92,11 +93,10 @@ function App() {
     return ( <
             Router >
             <
-            div className = "d-flex flex-column min-vh-100 bg-light" >
+            AppLayout >
             <
-            MainLayout >
+            Routes >
             <
-            Routes > { /* Routes publiques */ } <
             Route path = "/login"
             element = { < Login / > }
             /> <
@@ -107,10 +107,9 @@ function App() {
             element = { < About / > }
             />
 
-            { /* Routes protégées - tous les utilisateurs */ } <
+            <
             Route element = { < ProtectedRoute allowedRoles = {
-                    ['user', 'admin', 'superAdmin']
-                }
+                    ['user', 'admin', 'superAdmin'] }
                 />}> <
                 Route path = "/dashboard"
                 element = { < DashboardUser / > }
@@ -120,13 +119,12 @@ function App() {
                 /> <
                 Route path = "/request-vehicle"
                 element = { < RequestVehicle / > }
-                /> < /
-                Route >
+                /> <
+                /Route>
 
-                { /* Routes admin / superAdmin */ } <
+                <
                 Route element = { < ProtectedRoute allowedRoles = {
-                        ['admin', 'superAdmin']
-                    }
+                        ['admin', 'superAdmin'] }
                     />}> <
                     Route path = "/admin/dashboard"
                     element = { < DashboardAdmin / > }
@@ -148,17 +146,16 @@ function App() {
                     /> <
                     Route path = "/admin/vehicle-requests"
                     element = { < VehicleRequestsAdmin / > }
-                    /> < /
-                    Route >
+                    /> <
+                    /Route>
 
-                    { /* Accueil */ } <
+                    <
                     Route path = "/"
                     element = { < Navigate to = "/login"
-                        replace / >
-                    }
+                        replace / > }
                     />
 
-                    { /* 404 */ } <
+                    <
                     Route
                     path = "*"
                     element = { <
@@ -169,17 +166,14 @@ function App() {
                         a href = "/login"
                         className = "btn btn-primary btn-lg" >
                         Retour à la connexion <
-                        /a> < /
-                        div >
+                        /a> <
+                        /div>
                     }
-                    /> < /
-                    Routes > <
-                    /MainLayout>
+                    /> <
+                    /Routes> <
+                    /AppLayout>
 
-                    /
-
-
-                    { /* ToastContainer GLOBAL */ } <
+                    <
                     ToastContainer
                     position = "top-right"
                     autoClose = { 5000 }
@@ -192,8 +186,7 @@ function App() {
                     theme = "light" /
                     >
                     <
-                    /div> < /
-                    Router >
+                    /Router>
                 );
             }
 
