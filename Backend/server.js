@@ -35,7 +35,7 @@ console.log('🔑 Cloudinary configuré avec succès');
 // =========================
 app.use(express.json({ limit: '10mb' }));
 
-// CORS corrigé : autorise localhost (dev) + Vercel (prod)
+// CORS unique : autorise localhost (dev) + ton URL Vercel (prod)
 const allowedOrigins = [
     'http://localhost:3000',
     'https://intelli-task-peach.vercel.app', // ← TON URL VERCEL ICI
@@ -44,7 +44,7 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Permet les requêtes sans origin (ex: Postman, curl)
+        // Permet les requêtes sans origin (Postman, curl, etc.)
         if (!origin) return callback(null, true);
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
