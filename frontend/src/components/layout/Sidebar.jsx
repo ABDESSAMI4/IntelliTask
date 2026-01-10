@@ -1,9 +1,9 @@
-// src/components/layout/Sidebar.jsx - Avec lien Paramètres pour admin + traduction
+
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next'; // ← Ajout pour traduction
+import { useTranslation } from 'react-i18next'; 
 
 const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
-  const { t } = useTranslation(); // ← Pour utiliser t('settings')
+  const { t } = useTranslation(); 
   
   const isAdmin = user?.role === 'admin' || user?.role === 'superAdmin';
   const isUser = user?.role === 'user';

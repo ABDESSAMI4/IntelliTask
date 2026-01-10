@@ -1,4 +1,4 @@
-// src/components/LanguageSwitcher.jsx
+
 import { useTranslation } from 'react-i18next';
 
 const LanguageSwitcher = () => {
@@ -6,7 +6,7 @@ const LanguageSwitcher = () => {
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
-    localStorage.setItem('i18nextLng', lng); // Sauvegarde le choix
+    localStorage.setItem('i18nextLng', lng);
   };
 
   return (

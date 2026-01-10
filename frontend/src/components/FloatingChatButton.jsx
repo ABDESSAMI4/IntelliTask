@@ -1,4 +1,4 @@
-// src/components/FloatingChatButton.jsx - Tout le chat ici !
+
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import ChatBox from './ChatBox';
@@ -8,7 +8,7 @@ const FloatingChatButton = () => {
   const [activeTab, setActiveTab] = useState('general');
   const location = useLocation();
 
-  // Détecte si on est sur une page qui affiche des tâches (pour activer l'onglet tâche)
+ 
   const showTaskTab = location.pathname.includes('/admin/tasks') || location.pathname.includes('/dashboard');
 
   return (

@@ -1,17 +1,17 @@
-// src/components/layout/Header.jsx - Avec Dark Mode + Langue FR/EN
+
 import { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext'; // ← جديد: Dark Mode
-import { useTranslation } from 'react-i18next'; // ← جديد: Traduction
+import { useTheme } from '../../context/ThemeContext'; 
+import { useTranslation } from 'react-i18next'; 
 import { toast } from 'react-toastify';
 import Sidebar from './Sidebar';
 
 const Header = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useContext(AuthContext);
-  const { isDarkMode, toggleDarkMode } = useTheme(); // ← Dark Mode
-  const { t, i18n } = useTranslation(); // ← Traduction
+  const { isDarkMode, toggleDarkMode } = useTheme(); 
+  const { t, i18n } = useTranslation(); 
 
   const navigate = useNavigate();
 
@@ -52,11 +52,11 @@ const Header = () => {
             IntelliTask
           </Link>
 
-          {/* Droite: Langue + Dark Mode + Profil (desktop) */}
+          {/* Droite: Langue + Dark Mode + Profil  */}
           <div className="d-flex align-items-center ms-auto gap-3">
            
 
-            {/* Dark Mode Toggle */}
+            {/*  Mode Toggle */}
             <button
               onClick={toggleDarkMode}
               className="text-white text-2xl transition-all hover:scale-110 rounded-circle btn-outline-light"
@@ -65,7 +65,7 @@ const Header = () => {
               {isDarkMode ? '☀️' : '🌙'}
             </button>
 
-            {/* Profil utilisateur (visible seulement sur desktop) */}
+            {/* Profil utilisateur */}
             <div className="d-none d-lg-flex align-items-center">
               <div className="text-white text-end me-3">
                 <div className="fw-bold">{user?.name || user?.email}</div>

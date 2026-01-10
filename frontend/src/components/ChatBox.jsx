@@ -1,4 +1,4 @@
-// src/components/ChatBox.jsx
+
 import { useState, useEffect, useContext, useRef } from 'react';
 import API from '../services/api';
 import { toast } from 'react-toastify';
@@ -16,7 +16,7 @@ const ChatBox = ({ taskId = null }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Fonction pour choisir un emoji intelligent selon le message et le rôle
+
   const getMessageEmoji = (senderRole, content) => {
     const lower = content.toLowerCase();
 
@@ -35,7 +35,7 @@ const ChatBox = ({ taskId = null }) => {
     if (lower.includes('triste') || lower.includes('dommage')) return '😔';
 
     // Emoji aléatoire si rien ne matche (pour la joie !)
-    const randomEmojis = ['😊', '👍', '💪', '🌟', '🔥', '✨', '🤩', '🥳'];
+    const randomEmojis = ['🌟', ' ',];
     return randomEmojis[Math.floor(Math.random() * randomEmojis.length)];
   };
 

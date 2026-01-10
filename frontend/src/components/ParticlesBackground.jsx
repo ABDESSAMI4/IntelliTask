@@ -1,4 +1,4 @@
-// src/components/ParticlesBackground.jsx
+
 import { useEffect, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
@@ -25,8 +25,8 @@ const ParticlesBackground = () => {
         fpsLimit: 120,
         particles: {
           number: { 
-            value: 300, // Plus de 200 nœuds comme demandé !
-            density: { enable: true, value_area: 600 } // Meilleure répartition sur grand écran
+            value: 300, 
+            density: { enable: true, value_area: 600 } 
           },
           color: { value: "#ffffff" },
           shape: { type: "circle" },
@@ -34,7 +34,7 @@ const ParticlesBackground = () => {
           size: { value: 2.8, random: true },
           links: {
             enable: true,
-            distance: 160, // Plus de connexions visibles avec 250 nœuds
+            distance: 160, 
             color: "#ffffff",
             opacity: 0.4,
             width: 1.2,
@@ -52,7 +52,7 @@ const ParticlesBackground = () => {
           detectsOn: "window",
           events: {
             onHover: { enable: true, mode: "repulse" },
-            onClick: { enable: true, mode: "attract" }, // Mini-graph au clic
+            onClick: { enable: true, mode: "attract" }, 
             resize: true,
           },
           modes: {
@@ -61,10 +61,10 @@ const ParticlesBackground = () => {
               duration: 0.6,
             },
             attract: {
-              distance: 350,      // Plus de nœuds attirés (15-30 avec 250 total)
-              duration: 1.0,      // Convergence + divergence fluide
+              distance: 350,     
+              duration: 1.0,      
               easing: "ease-out-circ",
-              factor: 10,         // Force max pour effet "wow"
+              factor: 10,        
               speed: 6,
               maxSpeed: 100,
             },

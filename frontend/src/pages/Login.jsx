@@ -1,4 +1,4 @@
-// src/pages/Login.jsx - Traduction FR/EN fonctionne parfaitement + bouton langue
+// src/pages/Login.jsx - Traduction FR/EN + adaptation mobile améliorée
 import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -97,64 +97,62 @@ const Login = () => {
         {/* Particules */}
         <ParticlesBackground />
 
-        {/* Logo + Titre gauche */}
-        <div className="position-absolute top-0 start-0 p-4 p-lg-5" style={{ zIndex: 10 }}>
+        {/* Header : Logo + Titre + Langue + Se connecter (responsive) */}
+        <div className="position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-center px-3 px-md-5 py-3" style={{ zIndex: 10 }}>
+          {/* Logo + Titre à gauche */}
           <div className="d-flex align-items-center">
             <img
               src={logo}
               alt="IntelliTask Logo"
-              className="me-3 shadow-lg rounded-circle"
-              style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' }}
+              className="me-2 me-md-3 shadow rounded-circle img-fluid"
+              style={{ width: '50px', height: '50px', maxWidth: '60px' }} // Taille adaptée mobile
             />
             <div>
-              <h2 className="text-white fw-bold mb-0">IntelliTask</h2>
-              <small className="text-white opacity-75">{t('intelligent_management')}</small>
+              <h2 className="text-white fw-bold mb-0 fs-4 fs-md-3">IntelliTask</h2>
+              <small className="text-white opacity-75 d-none d-sm-inline">{t('intelligent_management')}</small>
             </div>
           </div>
-        </div>
 
-        {/* BOUTON LANGUE + SE CONNECTER droite */}
-        <div className="position-absolute top-0 end-0 p-4 p-lg-5 d-flex align-items-center gap-3" style={{ zIndex: 10 }}>
-         {/* BOUTON LANGUE – كود محدث مع تحسينات جمالية */}
-<div className="">
-  <button
-    onClick={() => changeLanguage('en')}
-    className={`btn btn-outline-light btn-lg shadow-lg px-2 fw-bold rounded-pill border-2${
-      i18n.language === 'en' ? 'bg-white text-blue-800' : 'text-white'
-    }`}
-    style={{ fontSize: '14px', minWidth: '50px' }}
-  >
-    EN
-  </button>
+          {/* Boutons langue + Se connecter à droite */}
+          <div className="d-flex align-items-center gap-2 gap-md-3">
+            {/* Boutons langue */}
+            <div className="d-flex gap-1">
+              <button
+                onClick={() => changeLanguage('en')}
+                className={`btn btn-outline-light btn-sm shadow-sm rounded-pill px-3 fw-bold ${
+                  i18n.language === 'en' ? 'bg-white text-primary' : ''
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => changeLanguage('fr')}
+                className={`btn btn-outline-light btn-sm shadow-sm rounded-pill px-3 fw-bold ${
+                  i18n.language === 'fr' ? 'bg-white text-primary' : ''
+                }`}
+              >
+                FR
+              </button>
+            </div>
 
-  <button
-    onClick={() => changeLanguage('fr')}
-    className={`btn btn-outline-light btn-lg shadow-lg px-2 fw-bold rounded-pill border-2${
-      i18n.language === 'fr' ? 'bg-white text-indigo-600' : 'text-white'
-    }`}
-    style={{ fontSize: '14px', minWidth: '50px' }}
-  >
-    FR
-  </button>
-</div>
-
-          {/* Bouton Se connecter */}
-          <button
-            onClick={() => setShowModal(true)}
-            className="btn btn-outline-light btn-lg shadow-lg px-5 fw-bold rounded-pill border-2"
-          >
-            {t('sign_in')}
-          </button>
+            {/* Bouton Se connecter */}
+            <button
+              onClick={() => setShowModal(true)}
+              className="btn btn-outline-light btn-sm shadow-sm px-4 fw-bold rounded-pill"
+            >
+              {t('sign_in')}
+            </button>
+          </div>
         </div>
 
         {/* Contenu centré */}
         <div className="text-center text-white position-relative" style={{ zIndex: 2 }}>
-          <h1 className="display-2 display-md-1 fw-bold mb-4">IntelliTask</h1>
-          <p className="fs-3 fs-md-2 opacity-90 mb-5">
+          <h1 className="display-4 display-md-2 fw-bold mb-3 mb-md-4">IntelliTask</h1>
+          <p className="fs-4 fs-md-3 opacity-90 mb-4 mb-md-5">
             {t('future_task_management')}
           </p>
 
-          <div className="d-flex flex-column flex-md-row justify-content-center gap-4">
+          <div className="d-flex flex-column flex-md-row justify-content-center gap-3 gap-md-4">
             <button
               onClick={() => setShowSolutions(!showSolutions)}
               className="btn btn-info btn-lg px-5 rounded-pill shadow-lg fw-bold text-white"
@@ -220,7 +218,7 @@ const Login = () => {
             <div className="row text-center text-md-start g-5">
               <div className="col-md-4">
                 <h5 className="fw-bold mb-4">{t('contact')}</h5>
-                <p className="mb-2">📞 +212 (0)6 24 04 60 76</p>
+                <p className="mb-2">📞 +212 (0) 625 37 88 837</p>
                 <p>✉️ a.aglagal@edu.ac.ma</p>
               </div>
               <div className="col-md-4">
@@ -233,7 +231,7 @@ const Login = () => {
                 <div className="d-flex justify-content-center justify-content-md-start gap-4 fs-3">
                   <a href="#" className="text-white transition-all hover-text-info">Facebook</a>
                   <a href="#" className="text-white transition-all hover-text-info">Instagram</a>
-                
+                  <a href="#" className="text-white transition-all hover-text-info">Twitter</a>
                   <a href="#" className="text-white transition-all hover-text-info">LinkedIn</a>
                 </div>
               </div>
@@ -257,7 +255,7 @@ const Login = () => {
           className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 1000 }}
         >
-          <div className="bg-white rounded-4 shadow-lg p-5" style={{ maxWidth: '550px', width: '90%' }}>
+          <div className="bg-white rounded-4 shadow-lg p-4 p-md-5" style={{ maxWidth: '550px', width: '90%' }}>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="fw-bold text-primary mb-0">
                 {isLogin ? t('sign_in') : t('sign_up')}

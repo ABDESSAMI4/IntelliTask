@@ -22,7 +22,7 @@ const NetworkGraph = () => {
       options={{
         fullScreen: {
           enable: true,
-          zIndex: 1 // Au-dessus du fond ville, mais sous le texte/logo/boutons
+          zIndex: 1 
         },
         background: {
           color: {
@@ -32,14 +32,14 @@ const NetworkGraph = () => {
         fpsLimit: 120,
         particles: {
           number: {
-            value: 400, // 400 nœuds comme demandé
+            value: 400, 
             density: {
               enable: true,
-              value_area: 800 // Bonne répartition sur tout l'écran
+              value_area: 800 
             }
           },
           color: {
-            value: "#ffffff" // Blanc pur, comme ton ParticlesBackground
+            value: "#ffffff" 
           },
           shape: {
             type: "circle"
@@ -55,7 +55,7 @@ const NetworkGraph = () => {
           links: {
             enable: true,
             distance: 160,
-            color: "#ffffff", // Liens blancs
+            color: "#ffffff", 
             opacity: 0.4,
             width: 1.2
           },
@@ -73,11 +73,11 @@ const NetworkGraph = () => {
           events: {
             onHover: {
               enable: true,
-              mode: "repulse" // Repousse les nœuds au survol
+              mode: "repulse" 
             },
             onClick: {
               enable: true,
-              mode: "attract" // Attire les nœuds au clic
+              mode: "attract" 
             },
             resize: true
           },
