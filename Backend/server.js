@@ -35,24 +35,26 @@ console.log('🔑 Cloudinary configuré avec succès');
 // =========================
 app.use(express.json({ limit: '10mb' }));
 
-// CORS unique : autorise localhost (dev) + ton URL Vercel (prod)
+// CORS unique et corrigé : autorise localhost (dev) + ton URL Vercel (prod)
 const allowedOrigins = [
-    'http://localhost:3000',
-    'https://intelli-task-peach.vercel.app', // ← TON URL VERCEL ICI
-    // Ajoute d'autres domaines si besoin (ex: ton domaine perso)
+    'http://localhost:3000', // Développement local
+    'https://intelli-task-t3cz.vercel.app', // ← TON URL VERCEL LIVE ICI
+    // Ajoute d'autres domaines si besoin (ex: domaine perso futur)
 ];
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Permet les requêtes sans origin (Postman, curl, etc.)
+        // Permet les requêtes sans origin (Postman, curl, tests)
         if (!origin) return callback(null, true);
+
+        // Autorise si l'origin est dans la liste
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Non autorisé par CORS'));
         }
     },
-    credentials: true,
+    credentials: true, // Très important pour cookies / auth
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     optionsSuccessStatus: 204,
@@ -62,8 +64,7 @@ app.use(cors({
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // =========================
-// ROUTE DE TEST
-// =========================
+// ROUTE DE TEST (vérifie que le backend répond)
 app.get('/', (req, res) => {
     res.status(200).json({
         message: '🚀 API IntelliTask est en marche !',
@@ -115,7 +116,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins, // ← Utilise la même liste que pour Express CORS
+        origin: allowedOrigins, // Même liste que Express CORS
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -134,7 +135,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// Rendre io accessible dans les controllers
+// Rendre io accessible dans les controllers (via req.app.get('io'))
 app.set('io', io);
 
 // =========================
