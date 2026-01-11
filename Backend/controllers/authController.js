@@ -1,18 +1,17 @@
-// backend/controllers/authController.js
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Génération du token avec id ET role
+
 const generateToken = (user) => {
     return jwt.sign({
             id: user._id,
-            role: user.role // ← IMPORTANT : on ajoute le rôle dans le token
+            role: user.role
         },
         process.env.JWT_SECRET, { expiresIn: '30d' }
     );
 };
 
-// === ROUTE TEMPORAIRE ===
+
 exports.makeFirstSuperAdmin = async(req, res) => {
     try {
         const firstUser = await User.findOne().sort({ createdAt: 1 });
@@ -81,7 +80,7 @@ exports.register = async(req, res) => {
                 role: user.role,
                 specialty: user.specialty,
                 grade: user.grade,
-                token: generateToken(user), // ← on passe l'objet user complet
+                token: generateToken(user),
             });
         }
     } catch (error) {
@@ -108,7 +107,7 @@ exports.login = async(req, res) => {
                 role: user.role,
                 specialty: user.specialty,
                 grade: user.grade,
-                token: generateToken(user), // ← on passe l'objet user complet
+                token: generateToken(user),
             });
         } else {
             res.status(401).json({ message: 'Email ou mot de passe incorrect' });

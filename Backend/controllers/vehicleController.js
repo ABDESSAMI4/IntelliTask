@@ -1,4 +1,3 @@
-// backend/controllers/vehicleController.js - Gestion des véhicules avec notifications
 const Vehicle = require('../models/Vehicle');
 const VehicleAssignment = require('../models/VehicleAssignment');
 const VehicleRequest = require('../models/VehicleRequest');
@@ -19,7 +18,7 @@ const isVehicleAvailable = async(vehicleId, dateDebut, dateFin, excludeId = null
     return conflicts.length === 0;
 };
 
-// 1. Liste tous les véhicules avec statut de disponibilité
+//  Liste tous les véhicules avec statut de disponibilité
 exports.getVehicles = async(req, res) => {
     try {
         const vehicles = await Vehicle.find().sort({ createdAt: -1 });
@@ -58,7 +57,7 @@ exports.getVehicles = async(req, res) => {
     }
 };
 
-// 2. Endpoint bonus : véhicules disponibles sur une période donnée
+//  véhicules disponibles sur une période donnée
 exports.getAvailableVehicles = async(req, res) => {
     try {
         const { dateDebut, dateFin } = req.query;
@@ -82,7 +81,7 @@ exports.getAvailableVehicles = async(req, res) => {
     }
 };
 
-// 3. Création d'un véhicule (avec notification à l'admin)
+//  Création d'un véhicule (avec notification à l'admin)
 exports.createVehicle = async(req, res) => {
     try {
         const { matricule, marque, modele, annee, type, carburant, notes } = req.body;
@@ -120,7 +119,7 @@ exports.createVehicle = async(req, res) => {
     }
 };
 
-// 4. Mise à jour d'un véhicule (notification seulement si changement important)
+// mise à jour d'un véhicule (notification seulement si changement important)
 exports.updateVehicle = async(req, res) => {
     try {
         const { id } = req.params;
@@ -129,7 +128,7 @@ exports.updateVehicle = async(req, res) => {
         const vehicle = await Vehicle.findById(id);
         if (!vehicle) return res.status(404).json({ message: 'Véhicule non trouvé' });
 
-        // Vérification matricule unique si modifié
+
         if (updates.matricule && updates.matricule.toUpperCase().trim() !== vehicle.matricule) {
             const existing = await Vehicle.findOne({ matricule: updates.matricule.toUpperCase().trim() });
             if (existing) return res.status(400).json({ message: 'Nouveau matricule déjà utilisé' });

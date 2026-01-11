@@ -1,4 +1,3 @@
-// backend/routes/assignmentRoutes.js
 const express = require('express');
 const router = express.Router();
 const { protect, admin } = require('../middleware/authMiddleware');
@@ -36,7 +35,7 @@ router.get('/', protect, admin('admin', 'superAdmin'), async(req, res) => {
         res.status(500).json({ message: 'Erreur serveur' });
     }
 });
-// GET - Mon historique complet (pending + responded)
+// GET historique complet 
 router.get('/my-history', protect, async(req, res) => {
     try {
         const assignments = await Assignment.find({ userId: req.user._id })
@@ -49,7 +48,7 @@ router.get('/my-history', protect, async(req, res) => {
     }
 });
 
-// GET - Assignations pending du user connecté
+// GET - user connecté
 router.get('/my-pending', protect, async(req, res) => {
     try {
         const assignments = await require('../models/Assignment')

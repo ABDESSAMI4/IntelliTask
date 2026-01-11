@@ -1,4 +1,3 @@
-// backend/routes/vehicleAssignmentRoutes.js
 const express = require('express');
 const router = express.Router();
 const { protect, admin } = require('../middleware/authMiddleware');
@@ -10,13 +9,13 @@ const {
 } = require('../controllers/vehicleAssignmentController');
 const VehicleAssignment = require('../models/VehicleAssignment');
 
-// === Routes Admin ===
+
 router.get('/', protect, getAssignments);
 router.post('/', protect, admin('admin', 'superAdmin'), createAssignment);
 router.put('/:id', protect, admin('admin', 'superAdmin'), updateAssignment);
 router.delete('/:id', protect, admin('admin', 'superAdmin'), deleteAssignment);
 
-// === Nouvelle route : Véhicules attribués à l'utilisateur connecté (auditeur) ===
+
 router.get('/my-vehicles', protect, async(req, res) => {
     try {
         const assignments = await VehicleAssignment.find({

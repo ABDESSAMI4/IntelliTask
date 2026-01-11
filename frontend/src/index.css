@@ -1,66 +1,74 @@
-/* Reset complet – élimine tous les espaces indésirables */
+/* App.css - Version finale propre, responsive et optimisée (dark mode + mobile) */
+
+
+/* Reset global – élimine tous les espaces indésirables */
 
 *,
 *::before,
 *::after {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html,
 body {
-    margin: 0;
-    padding: 0;
     height: 100%;
     width: 100%;
     overflow-x: hidden;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 
-/* Plein écran pour la page login */
+/* Plein écran parfait pour page login (mobile + desktop) */
 
-.min-h-screen,
-.login-fullscreen {
+.login-fullscreen,
+.min-h-screen {
     min-height: 100vh;
     min-height: 100dvh;
     /* Crucial pour iOS Safari */
+    width: 100vw;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 
-/* Supprime le décalage sidebar sur la page login */
+/* Supprime le décalage sidebar sur page login */
 
-body.login-page {
+body.login-page,
+body:has(.login-fullscreen) {
     margin-left: 0 !important;
     padding-left: 0 !important;
 }
 
 
-/* ==================== DARK MODE GLOBAL ==================== */
+/* Fond par défaut hors login */
+
+body:not(.login-page) {
+    background-color: #f8f9fa;
+}
+
+
+/* ------------------------------------------------- */
+
+
+/* DARK MODE GLOBAL (activé avec classe .dark sur html) */
 
 html.dark {
     background-color: #0f172a;
     color: #e2e8f0;
 }
 
-
-/* Fond blanc → gris très foncé */
-
 html.dark .bg-white {
     background-color: #1e293b !important;
     color: #e2e8f0 !important;
 }
 
-
-/* Fond light → gris foncé */
-
 html.dark .bg-light {
     background-color: #334155 !important;
 }
-
-
-/* TOUTES LES TEXTES NOIRES DEVIENNENT BLANCHES EN DARK MODE */
 
 html.dark .text-dark,
 html.dark .text-black,
@@ -68,15 +76,9 @@ html.dark .text-body {
     color: #e2e8f0 !important;
 }
 
-
-/* Textes muted (gris clair) */
-
 html.dark .text-muted {
     color: #94a3b8 !important;
 }
-
-
-/* Liens */
 
 html.dark a {
     color: #60a5fa !important;
@@ -86,17 +88,10 @@ html.dark a:hover {
     color: #93bbfc !important;
 }
 
-
-/* Cards */
-
 html.dark .card {
     background-color: #1e293b !important;
     border-color: #334155 !important;
-    color: #e2e8f0 !important;
 }
-
-
-/* Formulaires */
 
 html.dark .form-control,
 html.dark .form-select {
@@ -109,9 +104,6 @@ html.dark .form-control::placeholder,
 html.dark .form-select::placeholder {
     color: #94a3b8 !important;
 }
-
-
-/* Boutons primaires */
 
 html.dark .btn-primary {
     background-color: #3b82f6 !important;
@@ -128,51 +120,28 @@ html.dark .btn-outline-light:hover {
     color: #ffffff !important;
 }
 
-
-/* Tableaux */
-
 html.dark .table {
     --bs-table-bg: #1e293b;
     --bs-table-color: #e2e8f0;
     --bs-table-border-color: #334155;
 }
 
-html.dark .table th,
-html.dark .table td {
-    border-color: #334155 !important;
-}
-
-
-/* Navbar primaire (bleu) en dark mode */
-
-html.dark .navbar-dark.bg-primary {
-    background-color: #1d4ed8 !important;
-    /* Bleu plus foncé pour contraste */
-}
-
-
-/* Modal */
-
-html.dark .modal-content {
-    background-color: #1e293b !important;
-    color: #e2e8f0 !important;
-}
-
-
-/* Ombres plus douces en dark */
-
 html.dark .shadow-lg {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6) !important;
 }
 
 
-/* ==================== FIN DARK MODE ==================== */
+/* ------------------------------------------------- */
 
 
-/* Transitions et hovers */
+/* Transitions et hovers premium */
 
 .transition-all {
-    transition: all 0.3s ease;
+    transition: all 0.35s ease;
+}
+
+.hover-opacity-100:hover {
+    opacity: 1 !important;
 }
 
 .hover-bg-white:hover {
@@ -183,19 +152,76 @@ html.dark .shadow-lg {
     color: #0d6efd !important;
 }
 
+.hover-text-white:hover {
+    color: #ffffff !important;
+}
+
 .hover-shadow:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 
-/* Sidebar décalage uniquement sur les pages connectées */
+/* Placeholder input */
 
-body.logged-in {
-    margin-left: 280px;
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
 }
 
-@media (max-width: 991px) {
-    body.logged-in {
-        margin-left: 0 !important;
+
+/* ------------------------------------------------- */
+
+
+/* Responsive mobile spécifique pour Login page */
+
+@media (max-width: 576px) {
+    /* Téléphones petits */
+    .position-absolute.top-0 {
+        padding: 1rem !important;
     }
+    .btn {
+        font-size: 0.95rem !important;
+        padding: 0.5rem 1rem !important;
+        min-width: 80px !important;
+    }
+    img.rounded-circle {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    h1,
+    h2 {
+        font-size: 2rem !important;
+    }
+    .d-flex.align-items-center {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem !important;
+    }
+    /* Centre logo et boutons sur très petit écran */
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Tablettes et petits mobiles */
+    .btn-lg {
+        font-size: 1.1rem !important;
+        padding: 0.75rem 1.5rem !important;
+    }
+}
+
+
+/* ------------------------------------------------- */
+
+
+/* Autres utilitaires utiles */
+
+.rounded-circle {
+    object-fit: cover;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
 }

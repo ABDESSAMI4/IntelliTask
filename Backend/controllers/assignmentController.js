@@ -1,5 +1,3 @@
-// backend/controllers/assignmentController.js
-
 const Assignment = require('../models/Assignment');
 const Task = require('../models/Task');
 const User = require('../models/User');
@@ -11,7 +9,7 @@ if (process.env.OPENAI_API_KEY) {
     openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
-// Vérifie les chevauchements de dates pour un utilisateur
+
 const hasOverlap = async(userId, taskStart, taskEnd) => {
     if (!taskStart || !taskEnd) return false;
 
@@ -27,7 +25,7 @@ const hasOverlap = async(userId, taskStart, taskEnd) => {
     return overlapping.length > 0;
 };
 
-// Crée une assignation en attente (pending) avec notification, socket et auto-accept 24h
+
 const createPendingAssignment = async(task, user, reason = '', req = null) => {
         const assignment = await Assignment.create({
             taskId: task._id,
@@ -36,7 +34,7 @@ const createPendingAssignment = async(task, user, reason = '', req = null) => {
             justification: reason
         });
 
-        // Ajouter l'utilisateur à la liste des assignés dans la tâche
+
         task.assignedTo.push({ user: user._id, status: 'pending' });
         await task.save();
 
@@ -44,7 +42,7 @@ const createPendingAssignment = async(task, user, reason = '', req = null) => {
 
   await sendNotification(user, message, 'all');
 
-  // Émission en temps réel via Socket.io si disponible
+
   if (req && req.app && req.app.get('io')) {
     const io = req.app.get('io');
     io.to(`user_${user._id}`).emit('newAssignment', {
@@ -56,7 +54,7 @@ const createPendingAssignment = async(task, user, reason = '', req = null) => {
     });
   }
 
-  // Auto-accept après 24h si pas de réponse
+ 
   setTimeout(async () => {
     try {
       const currentAssignment = await Assignment.findById(assignment._id);
@@ -67,7 +65,7 @@ const createPendingAssignment = async(task, user, reason = '', req = null) => {
       currentAssignment.justification = '(Auto-accepté après 24h sans réponse)';
       await currentAssignment.save();
 
-      // Mise à jour du statut dans la tâche
+
       const updatedTask = await Task.findById(task._id);
       const assignedEntry = updatedTask.assignedTo.find(a => a.user.toString() === user._id.toString());
       if (assignedEntry) assignedEntry.status = 'accepted';
@@ -91,12 +89,12 @@ const createPendingAssignment = async(task, user, reason = '', req = null) => {
     } catch (err) {
       console.error('Erreur dans le timer auto-accept :', err);
     }
-  }, 24 * 60 * 60 * 1000); // 24 heures
+  }, 24 * 60 * 60 * 1000); 
 
   return assignment;
 };
 
-// Mock IA simple (tour de rôle + équité rémunérée)
+
 const mockAIAssignment = (task, candidates) => {
   const shuffled = [...candidates];
   shuffled.sort((a, b) => a.createdAt - b.createdAt);
@@ -110,7 +108,7 @@ const mockAIAssignment = (task, candidates) => {
   };
 };
 
-// 1. Assignation manuelle
+
 exports.manualAssignment = async (req, res) => {
   try {
     const { taskId, userIds } = req.body;
@@ -128,7 +126,7 @@ exports.manualAssignment = async (req, res) => {
     for (const user of validUsers) {
       const overlap = await hasOverlap(user._id, task.startDate, task.endDate);
       if (overlap) {
-        continue; // Ignorer si conflit de planning
+        continue; 
       }
 
       const assignment = await createPendingAssignment(task, user, 'Assignation manuelle par administrateur', req);
@@ -153,7 +151,7 @@ exports.manualAssignment = async (req, res) => {
   }
 };
 
-// 2. Assignation semi-automatique (équité + ancienneté)
+
 exports.semiAutoAssignment = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -166,14 +164,14 @@ exports.semiAutoAssignment = async (req, res) => {
       return res.status(400).json({ message: 'Toutes les places sont déjà pourvues' });
     }
 
-    // Filtres de compatibilité
+    
     const filters = { active: true, role: 'user' };
     if (task.specialties?.length > 0) filters.specialty = { $in: task.specialties };
     if (task.grades?.length > 0) filters.grade = { $in: task.grades };
 
     let candidates = await User.find(filters);
 
-    // Si tâche rémunérée → prioriser ceux qui en ont fait le moins
+  
     if (task.remunerated) {
       const remuneratedTaskIds = await Task.find({ remunerated: true }).distinct('_id');
       const acceptedCounts = await Assignment.aggregate([
@@ -235,7 +233,7 @@ exports.semiAutoAssignment = async (req, res) => {
   }
 };
 
-// 3. Assignation automatique avec IA (ou fallback mock)
+//  Assignation automatique avec IA 
 exports.autoAssignment = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -322,7 +320,7 @@ exports.autoAssignment = async (req, res) => {
   }
 };
 
-// 4. Répondre à une proposition d'assignation
+//  Répondre à une proposition d'assignation
 exports.respondToAssignment = async (req, res) => {
   try {
     const { assignmentId } = req.params;
@@ -356,7 +354,7 @@ exports.respondToAssignment = async (req, res) => {
     assignment.respondedAt = new Date();
     await assignment.save();
 
-    // Mise à jour du statut dans la tâche
+    
     const task = assignment.taskId;
     const assignedEntry = task.assignedTo.find(a => a.user.toString() === req.user._id.toString());
     if (assignedEntry) assignedEntry.status = status;
@@ -372,7 +370,7 @@ exports.respondToAssignment = async (req, res) => {
 
     if (admin) await sendNotification(admin, adminMessage, 'all');
 
-    // Cas délégation
+  
     if (status === 'delegated' && delegatedTo) {
       const newUser = await User.findById(delegatedTo);
       if (!newUser || !newUser.active) {

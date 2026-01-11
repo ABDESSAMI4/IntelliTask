@@ -1,9 +1,8 @@
-// backend/controllers/historyController.js
 const Assignment = require('../models/Assignment');
 const VehicleRequest = require('../models/VehicleRequest');
 const VehicleAssignment = require('../models/VehicleAssignment');
 
-// Historique tâches personnel (utilisé pour /my et /user/:userId)
+
 exports.getUserHistory = async(req, res) => {
     try {
         const userId = req.params.userId || req.user._id;
@@ -34,7 +33,7 @@ exports.getGlobalHistory = async(req, res) => {
     }
 };
 
-// Nouveau : Historique véhicules personnel
+//  Historique véhicules personnel
 exports.getUserVehicleHistory = async(req, res) => {
     try {
         const userId = req.params.userId || req.user._id;
@@ -60,7 +59,7 @@ exports.getUserVehicleHistory = async(req, res) => {
     }
 };
 
-// Nouveau : Historique véhicules global
+//  Historique véhicules global
 exports.getGlobalVehicleHistory = async(req, res) => {
     try {
         const requests = await VehicleRequest.find({})

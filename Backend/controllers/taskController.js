@@ -1,8 +1,7 @@
-// backend/controllers/taskController.js
 const Task = require('../models/Task');
 const cloudinary = require('cloudinary').v2;
 
-// Upload base64 vers Cloudinary (pour PDF)
+
 const uploadBase64ToCloudinary = async(base64String) => {
     if (!base64String || !base64String.startsWith('data:application/pdf;base64,')) {
         throw new Error('Format base64 invalide : doit commencer par data:application/pdf;base64,');
@@ -124,7 +123,7 @@ exports.getTasks = async(req, res) => {
     try {
         const tasks = await Task.find()
             .populate('createdBy', 'name email')
-            .sort({ createdAt: -1 }); // Plus récentes en premier
+            .sort({ createdAt: -1 });
 
         res.json(tasks);
     } catch (error) {

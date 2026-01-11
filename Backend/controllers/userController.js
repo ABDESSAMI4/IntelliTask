@@ -1,4 +1,3 @@
-// backend/controllers/userController.js
 const User = require('../models/User');
 
 // Lister tous les utilisateurs (admin uniquement)
@@ -17,13 +16,13 @@ exports.updateUser = async(req, res) => {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
 
-        // Protection : on ne peut pas modifier un superAdmin
+
         if (user.role === 'superAdmin' && req.user.role !== 'superAdmin') {
             return res.status(403).json({ message: 'Impossible de modifier un superAdmin' });
         }
 
         const updatedFields = req.body;
-        // Si on envoie un nouveau password, il sera hashé automatiquement par le pre('save')
+
 
         Object.assign(user, updatedFields);
         await user.save();

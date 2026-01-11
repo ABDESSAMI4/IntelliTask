@@ -1,5 +1,4 @@
-// backend/server.js - Version finale corrigée, CORS pour Vercel + Render live
-require('dotenv').config(); // Chargement des variables d'environnement
+require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -9,7 +8,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 
-// Vérification des variables obligatoires (évite crash silencieux)
+
 const requiredEnv = ['JWT_SECRET', 'MONGO_URI', 'PORT'];
 const missing = requiredEnv.filter(key => !process.env[key]);
 if (missing.length > 0) {
@@ -19,9 +18,7 @@ if (missing.length > 0) {
 
 const app = express();
 
-// =========================
-// CONFIGURATION CLOUDINARY
-// =========================
+
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -30,41 +27,38 @@ cloudinary.config({
 
 console.log('🔑 Cloudinary configuré avec succès');
 
-// =========================
-// MIDDLEWARES GLOBAUX
-// =========================
+
 app.use(express.json({ limit: '10mb' }));
 
-// CORS unique et corrigé : autorise localhost (dev) + ton URL Vercel (prod)
+
 const allowedOrigins = [
-    'http://localhost:3000', // Développement local
-    'https://intelli-task-t3cz.vercel.app', // ← TON URL VERCEL LIVE ICI
-    // Ajoute d'autres domaines si besoin (ex: domaine perso futur)
+    'http://localhost:3000',
+    'https://intelli-task-t3cz.vercel.app',
+
 ];
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Permet les requêtes sans origin (Postman, curl, tests)
+
         if (!origin) return callback(null, true);
 
-        // Autorise si l'origin est dans la liste
+
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Non autorisé par CORS'));
         }
     },
-    credentials: true, // Très important pour cookies / auth
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     optionsSuccessStatus: 204,
 }));
 
-// Servir les fichiers statiques (uploads)
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// =========================
-// ROUTE DE TEST (vérifie que le backend répond)
+
 app.get('/', (req, res) => {
     res.status(200).json({
         message: '🚀 API IntelliTask est en marche !',
@@ -74,9 +68,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// =========================
-// MONTAGE DES ROUTES API
-// =========================
+
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
@@ -87,9 +79,7 @@ app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/api/vehicle-assignments', require('./routes/vehicleAssignmentRoutes'));
 app.use('/api/vehicle-requests', require('./routes/vehicleRequestRoutes'));
 
-// =========================
-// 404 – Routes inexistantes
-// =========================
+//--------
 app.use('*', (req, res) => {
     res.status(404).json({
         message: 'Route non trouvée',
@@ -99,8 +89,7 @@ app.use('*', (req, res) => {
 });
 
 // =========================
-// CONNEXION MONGODB
-// =========================
+
 mongoose
     .connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB connecté avec succès'))
@@ -110,13 +99,12 @@ mongoose
     });
 
 // =========================
-// SOCKET.IO – CORS corrigé pour Vercel
-// =========================
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins, // Même liste que Express CORS
+        origin: allowedOrigins,
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -135,12 +123,11 @@ io.on('connection', (socket) => {
     });
 });
 
-// Rendre io accessible dans les controllers (via req.app.get('io'))
+
 app.set('io', io);
 
 // =========================
-// GESTION ERREURS GLOBALES
-// =========================
+
 app.use((err, req, res, next) => {
     console.error('🚨 Erreur serveur :', err);
 
@@ -151,8 +138,7 @@ app.use((err, req, res, next) => {
 });
 
 // =========================
-// DÉMARRAGE SERVEUR
-// =========================
+
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, '0.0.0.0', () => {

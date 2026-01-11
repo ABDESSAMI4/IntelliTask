@@ -1,12 +1,11 @@
-// test-resend.js
 require('dotenv').config();
 const sendNotification = require('./utils/notification');
 
-// Test d'envoi d'email avec Resend
+
 sendNotification({
             _id: 'test-notification',
-            email: 'a.aglagal@edu.umi.ac.ma', // Ton email @edu
-            name: 'Abdessami' // Optionnel, mais utile pour personnaliser
+            email: 'a.aglagal@edu.umi.ac.ma',
+            name: 'Abdessami'
         },
         '🎉 Félicitations ! Test Resend réussi !\n\nTon système de notification IntelliTask fonctionne maintenant parfaitement avec Resend.\n\nTu peux maintenant envoyer des emails automatiques pour :\n• Confirmation de compte\n• Demandes de véhicules acceptées/refusées\n• Nouvelles tâches assignées\n• Rappels\n\n🚀 Prochaine étape : le déploiement complet !',
         'email'

@@ -22,7 +22,7 @@ const vehicleAssignmentSchema = new mongoose.Schema({
         required: true
     },
     dateDebut: { type: Date, required: true },
-    dateFin: { type: Date }, // null = en cours
+    dateFin: { type: Date },
     direction: { type: String, default: '' },
     notes: { type: String, default: '' },
     statut: {

@@ -1,4 +1,3 @@
-// backend/utils/notification.js
 const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -8,8 +7,7 @@ const sendNotification = async(user, message, type = 'all') => {
         // === Envoi Email via Resend ===
         if (type === 'email' || type === 'all') {
             const { data, error } = await resend.emails.send({
-                from: 'onboarding@resend.dev', // Expéditeur par défaut pour test (autorisé sans vérification)
-                to: [user.email],
+                from: 'onboarding@resend.dev',
                 subject: '📩 Notification TaskMe',
                 text: message,
             });
@@ -22,7 +20,7 @@ const sendNotification = async(user, message, type = 'all') => {
             console.log(`✅ Email envoyé avec succès à ${user.email} (ID: ${data.id})`);
         }
 
-        // === Notification Socket.io (real-time) ===
+        //  Notification Socket.io 
         if (type === 'socket' || type === 'all') {
             global.io.emit('notification', {
                 userId: user._id,

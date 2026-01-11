@@ -1,14 +1,12 @@
-// backend/routes/vehicleRequestRoutes.js
-
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose'); // Ajouté pour ObjectId validation
+const mongoose = require('mongoose');
 const { protect, admin } = require('../middleware/authMiddleware');
 const VehicleRequest = require('../models/VehicleRequest');
 const VehicleAssignment = require('../models/VehicleAssignment');
-const Vehicle = require('../models/Vehicle'); // Importé une seule fois en haut
+const Vehicle = require('../models/Vehicle');
 
-// Helper : vérification disponibilité véhicule
+// vérification disponibilité véhicule
 const isVehicleAvailable = async(vehicleId, dateDebut, dateFin) => {
     try {
         const query = {
@@ -26,33 +24,33 @@ const isVehicleAvailable = async(vehicleId, dateDebut, dateFin) => {
     }
 };
 
-// Helper : validation format date
+//  validation format date
 const isValidDate = (dateStr) => {
     if (!dateStr) return true;
     const date = new Date(dateStr);
     return date instanceof Date && !isNaN(date);
 };
 
-// 1. Créer une demande (auditeur)
+// 1. Créer une demande 
 router.post('/', protect, async(req, res) => {
     try {
         const { vehicle, dateDebut, dateFin, direction, notes } = req.body;
 
-        // Validation champs
+
         if (!vehicle || !dateDebut) {
             return res.status(400).json({
                 message: 'Véhicule et date de début sont obligatoires.'
             });
         }
 
-        // Validation format dates
+
         if (!isValidDate(dateDebut) || (dateFin && !isValidDate(dateFin))) {
             return res.status(400).json({
                 message: 'Format de date invalide (utilisez YYYY-MM-DD).'
             });
         }
 
-        // Validation ObjectId
+
         if (!mongoose.Types.ObjectId.isValid(vehicle)) {
             return res.status(400).json({
                 message: 'ID du véhicule invalide.'
@@ -78,7 +76,7 @@ router.post('/', protect, async(req, res) => {
             status: 'en_attente'
         });
 
-        // Populate pour réponse claire
+
         await request.populate('user', 'name email');
         await request.populate('vehicle', 'matricule marque modele');
 

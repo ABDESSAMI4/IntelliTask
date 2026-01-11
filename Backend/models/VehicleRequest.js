@@ -1,4 +1,3 @@
-// backend/models/VehicleRequest.js
 const mongoose = require('mongoose');
 
 const vehicleRequestSchema = new mongoose.Schema({
@@ -18,7 +17,7 @@ const vehicleRequestSchema = new mongoose.Schema({
     },
     dateFin: {
         type: Date
-            // Peut être null si usage sur une seule journée
+
     },
     direction: {
         type: String,
@@ -45,7 +44,7 @@ const vehicleRequestSchema = new mongoose.Schema({
         trim: true
     }
 }, {
-    timestamps: true // createdAt et updatedAt automatiques
+    timestamps: true
 });
 
 module.exports = mongoose.model('VehicleRequest', vehicleRequestSchema);

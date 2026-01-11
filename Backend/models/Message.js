@@ -1,4 +1,3 @@
-// backend/models/Message.js
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
@@ -16,7 +15,7 @@ const messageSchema = new mongoose.Schema({
     task: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Task',
-        default: null // null = chat global
+        default: null
     },
     createdAt: {
         type: Date,

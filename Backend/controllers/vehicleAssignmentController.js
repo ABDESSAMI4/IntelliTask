@@ -61,7 +61,7 @@ exports.createAssignment = async(req, res) => {
         await assignment.populate('vehicle', 'matricule marque modele');
         await assignment.populate('users', 'name email');
 
-        // Notification en temps réel
+
         const io = req.app.get('io');
         if (io) {
             users.forEach(userId => {

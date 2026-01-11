@@ -10,7 +10,7 @@ const {
 } = require('../controllers/vehicleController');
 
 router.get('/', protect, getVehicles);
-router.get('/available', protect, getAvailableVehicles); // Bonus très utile
+router.get('/available', protect, getAvailableVehicles);
 router.post('/', protect, admin('admin', 'superAdmin'), createVehicle);
 router.put('/:id', protect, admin('admin', 'superAdmin'), updateVehicle);
 router.delete('/:id', protect, admin('admin', 'superAdmin'), deleteVehicle);

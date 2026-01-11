@@ -1,4 +1,3 @@
-// backend/models/Task.js
 const mongoose = require('mongoose');
 
 const TaskSchema = new mongoose.Schema({
@@ -15,11 +14,11 @@ const TaskSchema = new mongoose.Schema({
     type: {
         type: String,
         trim: true,
-        // optionnel
+
     },
     startDate: {
         type: Date,
-        // optionnel
+
     },
     endDate: {
         type: Date,
@@ -52,7 +51,7 @@ const TaskSchema = new mongoose.Schema({
         trim: true,
     },
     adminFile: {
-        type: String, // URL Cloudinary
+        type: String,
     },
     places: {
         type: Number,
@@ -73,7 +72,8 @@ const TaskSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true // gardé pour traçabilité
+        // gardé pour traçabilité
+        required: true
     },
     createdAt: {
         type: Date,
