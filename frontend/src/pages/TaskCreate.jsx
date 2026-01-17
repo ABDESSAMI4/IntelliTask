@@ -22,7 +22,7 @@ const TaskCreate = () => {
     needsVehicle: false,
     direction: '',
     isCommon: false,
-    adminFile: null
+    adminFile: null  // ← Pour le fichier PDF (base64)
   });
 
   const specialtiesOptions = ['informatique', 'pedagogique', 'planification', 'financiers', 'orientation'];
@@ -50,6 +50,10 @@ const TaskCreate = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.type !== 'application/pdf') {
+        toast.error('Seuls les fichiers PDF sont autorisés');
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({ ...prev, adminFile: reader.result }));
@@ -239,6 +243,7 @@ const TaskCreate = () => {
                   </div>
                 </div>
 
+                {/* AJOUT INPUT PDF */}
                 <div className="mb-4">
                   <label className="form-label fw-bold">Fichier PDF (guide administratif)</label>
                   <input

@@ -14,11 +14,9 @@ const TaskSchema = new mongoose.Schema({
     type: {
         type: String,
         trim: true,
-
     },
     startDate: {
         type: Date,
-
     },
     endDate: {
         type: Date,
@@ -74,6 +72,15 @@ const TaskSchema = new mongoose.Schema({
         ref: 'User',
         // gardé pour traçabilité
         required: true
+    },
+    // AJOUT PDF
+    pdfUrl: {
+        type: String,
+        default: null
+    },
+    pdfPublicId: {
+        type: String,
+        default: null
     },
     createdAt: {
         type: Date,

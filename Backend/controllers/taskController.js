@@ -9,7 +9,11 @@ const uploadBase64ToCloudinary = async(base64String) => {
     return await cloudinary.uploader.upload(base64String, {
         resource_type: 'raw',
         folder: 'tasks_admin_files',
-        format: 'pdf'
+        format: 'pdf',
+        access_mode: 'public', // ← Obligatoire
+        type: 'upload', // ← Ajoute si pas déjà
+        overwrite: true,
+        use_filename: true // ← Optionnel : garde le nom original
     });
 };
 
@@ -58,24 +62,19 @@ exports.createTask = async(req, res) => {
             return res.status(400).json({ message: 'Données invalides', errors });
         }
 
-        let adminFileUrl = null;
-        if (adminFile) {
-            if (typeof adminFile === 'string' && adminFile.startsWith('data:application/pdf;base64,')) {
-                try {
-                    const result = await uploadBase64ToCloudinary(adminFile);
-                    adminFileUrl = result.secure_url;
-                } catch (uploadErr) {
-                    console.error('Erreur upload Cloudinary :', uploadErr);
-                    return res.status(400).json({
-                        message: 'Erreur lors de l’upload du PDF'
-                    });
-                }
-            } else if (typeof adminFile === 'string' && adminFile.startsWith('http')) {
-                adminFileUrl = adminFile;
-            } else {
-                return res.status(400).json({
-                    message: 'adminFile doit être une chaîne base64 valide ou une URL'
-                });
+        let pdfUrl = null;
+        let pdfPublicId = null;
+
+        // Gestion PDF (base64 envoyé depuis frontend)
+        if (adminFile && adminFile.startsWith('data:application/pdf;base64,')) {
+            try {
+                const result = await uploadBase64ToCloudinary(adminFile);
+                pdfUrl = result.secure_url;
+                pdfPublicId = result.public_id;
+                console.log('PDF uploadé avec succès :', pdfUrl); // log pour debug
+            } catch (uploadErr) {
+                console.error('Erreur upload PDF :', uploadErr);
+                return res.status(400).json({ message: 'Erreur upload PDF' });
             }
         }
 
@@ -93,7 +92,9 @@ exports.createTask = async(req, res) => {
             needsVehicle: needsVehicle === true,
             direction: direction && typeof direction === 'string' ? direction.trim() : '',
             isCommon: isCommon === true,
-            adminFile: adminFileUrl,
+            adminFile: pdfUrl, // garde si tu veux
+            pdfUrl, // IMPORTANT : on sauvegarde ici pour le bouton
+            pdfPublicId,
             createdBy: req.user._id,
             status: 'ouverte'
         });
@@ -147,8 +148,27 @@ exports.getTaskById = async(req, res) => {
 // UPDATE TASK (optionnel)
 exports.updateTask = async(req, res) => {
     try {
-        const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const task = await Task.findById(req.params.id);
         if (!task) return res.status(404).json({ message: 'Tâche non trouvée' });
+
+        // Mise à jour PDF si nouveau fichier envoyé
+        if (req.body.adminFile && req.body.adminFile.startsWith('data:application/pdf;base64,')) {
+            try {
+                const result = await uploadBase64ToCloudinary(req.body.adminFile);
+                task.pdfUrl = result.secure_url;
+                task.pdfPublicId = result.public_id;
+                task.adminFile = result.secure_url;
+                console.log('PDF mis à jour avec succès :', task.pdfUrl);
+            } catch (uploadErr) {
+                console.error('Erreur update PDF :', uploadErr);
+                return res.status(400).json({ message: 'Erreur update PDF' });
+            }
+        }
+
+        // Mise à jour des autres champs
+        Object.assign(task, req.body);
+        await task.save();
+
         res.json({ message: 'Tâche mise à jour', task });
     } catch (error) {
         res.status(500).json({ message: 'Erreur mise à jour' });

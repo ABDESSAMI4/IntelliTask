@@ -1,22 +1,10 @@
-/* App.css - Version finale propre et optimisée */
-
-
-/* Suppression du code React par défaut inutile */
-
 .App,
 .App-header,
 .App-logo,
 .App-link,
 @keyframes App-logo-spin {
     display: none;
-    /* Plus besoin pour ton projet */
 }
-
-
-/* ------------------------------------------------- */
-
-
-/* Sidebar moderne – style premium (bleu ou noir selon besoin) */
 
 .transition-all {
     transition: all 0.35s ease;
@@ -46,18 +34,9 @@
     opacity: 1 !important;
 }
 
-
-/* Placeholder input recherche dans sidebar */
-
 .form-control::placeholder {
     color: rgba(255, 255, 255, 0.5);
 }
-
-
-/* ------------------------------------------------- */
-
-
-/* PLEIN ÉCRAN POUR PAGE LOGIN – AUCUN ESPACE BLANC */
 
 html,
 body {
@@ -82,27 +61,15 @@ body {
     flex-direction: column;
 }
 
-
-/* Supprime le décalage sidebar sur la page login */
-
 body.login-page,
 body:has(.login-fullscreen) {
     margin-left: 0 !important;
     padding-left: 0 !important;
 }
 
-
-/* Optionnel : si tu veux un fond sombre global en dehors du login */
-
 body:not(.login-page) {
     background-color: #f8f9fa;
 }
-
-
-/* ------------------------------------------------- */
-
-
-/* Autres utilitaires (si tu les utilises ailleurs) */
 
 .hover-shadow:hover {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);

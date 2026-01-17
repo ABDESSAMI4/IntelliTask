@@ -348,10 +348,21 @@ exports.respondToAssignment = async (req, res) => {
       return res.status(400).json({ message: 'Cette assignation a déjà été traitée' });
     }
 
+    // AJOUT ANTI-RE-DÉLÉGATION
+    if (status === 'delegated' && assignment.delegationLevel >= 1) {
+      return res.status(403).json({ message: 'Vous ne pouvez pas re-déléguer cette tâche' });
+    }
+
     assignment.status = status;
     assignment.justification = justification.trim();
     assignment.comment = comment.trim();
     assignment.respondedAt = new Date();
+
+    // Incrémente delegationLevel si délégation
+    if (status === 'delegated') {
+      assignment.delegationLevel += 1;
+    }
+
     await assignment.save();
 
     

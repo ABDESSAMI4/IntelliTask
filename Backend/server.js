@@ -8,6 +8,13 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 
+// AJOUT POUR LE CRON (auto-refus 24h)
+const cron = require('node-cron');
+const Assignment = require('./models/Assignment');
+const Task = require('./models/Task');
+const User = require('./models/User');
+const sendNotification = require('./utils/notification');
+
 
 const requiredEnv = ['JWT_SECRET', 'MONGO_URI', 'PORT'];
 const missing = requiredEnv.filter(key => !process.env[key]);
@@ -125,6 +132,40 @@ io.on('connection', (socket) => {
 
 
 app.set('io', io);
+
+// =========================
+
+// AJOUT DU CRON POUR AUTO-REFUS APRÈS 24H + RETOUR À SENDER
+cron.schedule('0 * * * *', async() => { // Toutes les heures
+    console.log('Cron : vérification tâches pending > 24h');
+
+    const pending = await Assignment.find({
+        status: 'pending',
+        createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } // > 24h
+    }).populate('taskId');
+
+    for (const ass of pending) {
+        ass.status = 'refused';
+        ass.justification = 'Délai de 24h dépassé sans réponse';
+        await ass.save();
+
+        // Retour à la personne de départ (créateur de la tâche)
+        const task = ass.taskId;
+        task.assignedTo = [{ user: task.createdBy, status: 'refused' }];
+        await task.save();
+
+        // Notification au créateur
+        const creator = await User.findById(task.createdBy);
+        if (creator) {
+            sendNotification(creator,
+                `Tâche "${task.name}" refusée automatiquement (délai dépassé). Retournée à vous.`,
+                'email'
+            );
+        }
+
+        console.log(`Tâche ${task._id} refusée auto + retournée à créateur`);
+    }
+});
 
 // =========================
 

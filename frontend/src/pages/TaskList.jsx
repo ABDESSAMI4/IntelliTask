@@ -92,6 +92,21 @@ const TaskList = () => {
                         <p className="mb-1"><strong>Spécialités :</strong> {task.specialties?.join(', ') || 'Aucune'}</p>
                       </div>
 
+                      {/* BOUTON PDF CORRIGÉ – SIMPLE ET PUBLIC */}
+                    {/* AFFICHAGE PDF - UTILISE pdfUrl OU adminFile */}
+{(task.adminFile || task.pdfUrl) && (
+  <div className="mt-3">
+    <a 
+      href={task.pdfUrl || task.adminFile}  // ← priorise pdfUrl si existe, sinon adminFile
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="btn btn-sm btn-info"
+    >
+      📄 Voir PDF joint
+    </a>
+  </div>
+)}
+
                       <div className="mt-4">
                         <div className="btn-group w-100" role="group">
                           <button
@@ -118,8 +133,6 @@ const TaskList = () => {
                         </div>
                       </div>
                     </div>
-
-                   
                   </div>
                 </div>
               </div>
