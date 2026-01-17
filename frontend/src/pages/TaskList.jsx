@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import API from '../services/api';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import ChatBox from '../components/ChatBox'; // ← Le chat par tâche
+//import ChatBox from '../components/ChatBox'; // ← Le chat par tâche
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
@@ -106,6 +106,7 @@ const TaskList = () => {
     </a>
   </div>
 )}
+     
 
                       <div className="mt-4">
                         <div className="btn-group w-100" role="group">

@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from 'react';
 import { toast } from 'react-toastify';
 import API from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import ChatBox from '../components/ChatBox';
+//import ChatBox from '../components/ChatBox';
 
 const DashboardUser = () => {
   const { user } = useContext(AuthContext);
