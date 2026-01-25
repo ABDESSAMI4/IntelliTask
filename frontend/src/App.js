@@ -121,7 +121,8 @@ function App() {
 
             <
             Route element = { < ProtectedRoute allowedRoles = {
-                    ['user', 'admin', 'superAdmin'] }
+                    ['user', 'admin', 'superAdmin']
+                }
                 />}> <
                 Route path = "/dashboard"
                 element = { < DashboardUser / > }
@@ -131,12 +132,13 @@ function App() {
                 /> <
                 Route path = "/request-vehicle"
                 element = { < RequestVehicle / > }
-                /> <
-                /Route>
+                /> < /
+                Route >
 
                 <
                 Route element = { < ProtectedRoute allowedRoles = {
-                        ['admin', 'superAdmin'] }
+                        ['admin', 'superAdmin']
+                    }
                     />}> <
                     Route path = "/admin/dashboard"
                     element = { < DashboardAdmin / > }
@@ -161,13 +163,14 @@ function App() {
                     /> <
                     Route path = "/admin/settings"
                     element = { < Settings / > }
-                    /> <
-                    /Route>
+                    /> < /
+                    Route >
 
                     <
                     Route path = "/"
                     element = { < Navigate to = "/login"
-                        replace / > }
+                        replace / >
+                    }
                     />
 
                     <
@@ -181,11 +184,11 @@ function App() {
                         a href = "/login"
                         className = "btn btn-primary btn-lg" >
                         Retour à la connexion <
-                        /a> <
-                        /div>
+                        /a> < /
+                        div >
                     }
-                    /> <
-                    /Routes> <
+                    /> < /
+                    Routes > <
                     /AppLayout>
 
                     <
@@ -201,8 +204,8 @@ function App() {
                     theme = "light" /
                     >
                     <
-                    /Router> <
-                    /AuthProvider> <
+                    /Router> < /
+                    AuthProvider > <
                     /ThemeProvider>
                 );
             }
