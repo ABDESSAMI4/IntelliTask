@@ -31,13 +31,13 @@ const userSchema = new mongoose.Schema({
     },
     specialty: {
         type: String,
-        enum: ['pedagogique', 'orientation', 'planification', 'financiers', 'informatique', null], // ← Ajouté "informatique"
         default: null,
+        // enum supprimé → accepte n'importe quelle chaîne (plus flexible)
     },
     grade: {
         type: String,
-        enum: ['A', 'B', 'C', null],
         default: null,
+        // enum supprimé → accepte A, B, C ou autre
     },
     diplomas: [{ type: String }],
     formations: [{ type: String }],

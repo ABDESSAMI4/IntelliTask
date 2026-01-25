@@ -7,7 +7,7 @@ import {
     Navigate,
     useLocation,
 } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify'; // ← toast bien importé
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -25,17 +25,21 @@ import About from './pages/About';
 import VehicleList from './pages/VehicleList';
 import RequestVehicle from './pages/RequestVehicle';
 import VehicleRequestsAdmin from './pages/VehicleRequestsAdmin';
-import Settings from './pages/Settings'; // ← Import de la page Settings
+import Settings from './pages/Settings';
 
 // Composants
 import Header from './components/layout/Header';
-import FloatingChatButton from './components/FloatingChatButton'; // ← Ajout pour le chat flottant
+import FloatingChatButton from './components/FloatingChatButton';
 
 // Utils
 import ProtectedRoute from './utils/ProtectedRoute';
 
 // Socket.io
 import socket from './socket';
+
+// Context – Imports corrigés (named si export const)
+import { AuthProvider } from './context/AuthContext'; // named import
+import { ThemeProvider } from './context/ThemeContext'; // named import
 
 const AppLayout = ({ children }) => {
     const location = useLocation();
@@ -53,7 +57,8 @@ const AppLayout = ({ children }) => {
         Header / >
         <
         main className = "flex-grow-1 pt-5" > { children } < /main> <
-        FloatingChatButton / > { /* ← Ajout du bouton chat flottant sur les pages connectées */ } <
+        FloatingChatButton / >
+        <
         /div>
     );
 };
@@ -61,7 +66,7 @@ const AppLayout = ({ children }) => {
 function App() {
     useEffect(() => {
         const userStr = localStorage.getItem('user');
-        if (userStr) {
+        if (userStr && userStr !== 'undefined') {
             try {
                 const user = JSON.parse(userStr);
                 if (user && user._id) {
@@ -69,6 +74,7 @@ function App() {
                 }
             } catch (e) {
                 console.error('Erreur parsing user localStorage', e);
+                localStorage.removeItem('user');
             }
         }
 
@@ -93,11 +99,16 @@ function App() {
     }, []);
 
     return ( <
+            ThemeProvider >
+            <
+            AuthProvider >
+            <
             Router >
             <
             AppLayout >
             <
-            Routes > { /* Routes publiques */ } <
+            Routes >
+            <
             Route path = "/login"
             element = { < Login / > }
             /> <
@@ -108,7 +119,7 @@ function App() {
             element = { < About / > }
             />
 
-            { /* Routes utilisateur connecté */ } <
+            <
             Route element = { < ProtectedRoute allowedRoles = {
                     ['user', 'admin', 'superAdmin'] }
                 />}> <
@@ -123,7 +134,7 @@ function App() {
                 /> <
                 /Route>
 
-                { /* Routes admin / superAdmin */ } <
+                <
                 Route element = { < ProtectedRoute allowedRoles = {
                         ['admin', 'superAdmin'] }
                     />}> <
@@ -147,19 +158,19 @@ function App() {
                     /> <
                     Route path = "/admin/vehicle-requests"
                     element = { < VehicleRequestsAdmin / > }
-                    /> { /* Page Paramètres */ } <
+                    /> <
                     Route path = "/admin/settings"
                     element = { < Settings / > }
                     /> <
                     /Route>
 
-                    { /* Accueil */ } <
+                    <
                     Route path = "/"
                     element = { < Navigate to = "/login"
                         replace / > }
                     />
 
-                    { /* 404 */ } <
+                    <
                     Route
                     path = "*"
                     element = { <
@@ -177,7 +188,7 @@ function App() {
                     /Routes> <
                     /AppLayout>
 
-                    { /* ToastContainer global */ } <
+                    <
                     ToastContainer
                     position = "top-right"
                     autoClose = { 5000 }
@@ -190,7 +201,9 @@ function App() {
                     theme = "light" /
                     >
                     <
-                    /Router>
+                    /Router> <
+                    /AuthProvider> <
+                    /ThemeProvider>
                 );
             }
 

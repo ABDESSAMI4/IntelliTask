@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
@@ -85,6 +86,8 @@ app.use('/api/history', require('./routes/historyRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
 app.use('/api/vehicle-assignments', require('./routes/vehicleAssignmentRoutes'));
 app.use('/api/vehicle-requests', require('./routes/vehicleRequestRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+
 
 //--------
 app.use('*', (req, res) => {

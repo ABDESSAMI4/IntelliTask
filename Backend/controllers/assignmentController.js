@@ -2,6 +2,7 @@ const Assignment = require('../models/Assignment');
 const Task = require('../models/Task');
 const User = require('../models/User');
 const sendNotification = require('../utils/notification');
+const createNotification = require('../utils/createNotification');
 
 let openai = null;
 if (process.env.OPENAI_API_KEY) {
@@ -9,7 +10,7 @@ if (process.env.OPENAI_API_KEY) {
     openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
-
+// Fonction pour vérifier chevauchement de planning
 const hasOverlap = async(userId, taskStart, taskEnd) => {
     if (!taskStart || !taskEnd) return false;
 
@@ -25,7 +26,7 @@ const hasOverlap = async(userId, taskStart, taskEnd) => {
     return overlapping.length > 0;
 };
 
-
+// Créer une assignation pending avec notification
 const createPendingAssignment = async(task, user, reason = '', req = null) => {
         const assignment = await Assignment.create({
             taskId: task._id,
@@ -34,14 +35,19 @@ const createPendingAssignment = async(task, user, reason = '', req = null) => {
             justification: reason
         });
 
-
         task.assignedTo.push({ user: user._id, status: 'pending' });
         await task.save();
 
         const message = `Vous avez été proposé pour la tâche "${task.name}".\nRépondez dans les 24 heures !${reason ? `\n\nRaison : ${reason}` : ''}`;
 
   await sendNotification(user, message, 'all');
-
+  await createNotification({
+    userId: user._id,
+    title: `Nouvelle affectation pour "${task.name}"`,
+    message: `Vous avez été proposé pour cette tâche. Répondez dans 24h !${reason ? `\nRaison: ${reason}` : ''}`,
+    type: 'assignment',
+    relatedTaskId: task._id
+});
 
   if (req && req.app && req.app.get('io')) {
     const io = req.app.get('io');
@@ -94,7 +100,7 @@ const createPendingAssignment = async(task, user, reason = '', req = null) => {
   return assignment;
 };
 
-
+// Mock IA simple (tour de rôle)
 const mockAIAssignment = (task, candidates) => {
   const shuffled = [...candidates];
   shuffled.sort((a, b) => a.createdAt - b.createdAt);
@@ -108,7 +114,7 @@ const mockAIAssignment = (task, candidates) => {
   };
 };
 
-
+// Assignation manuelle
 exports.manualAssignment = async (req, res) => {
   try {
     const { taskId, userIds } = req.body;
@@ -151,7 +157,7 @@ exports.manualAssignment = async (req, res) => {
   }
 };
 
-
+// Assignation semi-auto
 exports.semiAutoAssignment = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -233,7 +239,7 @@ exports.semiAutoAssignment = async (req, res) => {
   }
 };
 
-//  Assignation automatique avec IA 
+// Assignation automatique avec IA 
 exports.autoAssignment = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -320,7 +326,7 @@ exports.autoAssignment = async (req, res) => {
   }
 };
 
-//  Répondre à une proposition d'assignation
+// Répondre à une proposition d'assignation
 exports.respondToAssignment = async (req, res) => {
   try {
     const { assignmentId } = req.params;
@@ -391,7 +397,43 @@ exports.respondToAssignment = async (req, res) => {
       await createPendingAssignment(task, newUser, `Délégué par ${req.user.name}${comment ? ' - ' + comment : ''}`, req);
 
       await sendNotification(admin, `${req.user.name} a délégué la tâche "${task.name}" à ${newUser.name}.`, 'all');
+      // Notif pour l'admin/créateur
+if (admin) {
+    await createNotification({
+        userId: admin._id,
+        title: `Réponse à affectation pour "${task.name}"`,
+        message: `${req.user.name} a ${status === 'accepted' ? 'accepté' : status === 'refused' ? 'refusé' : 'délégué'} la tâche.${status === 'refused' && justification ? `\nJustification: ${justification}` : ''}`,
+        type: status === 'delegated' ? 'delegation' : 'assignment',
+        relatedTaskId: task._id,
+        relatedUserId: req.user._id
+    });
+}
+
+// Si délégation, notif au nouveau user (déjà géré par createPendingAssignment, mais ajoutons pour le délégateur)
+if (status === 'delegated' && delegatedTo) {
+    await createNotification({
+        userId: req.user._id,  // Délégateur
+        title: `Délégation réussie pour "${task.name}"`,
+        message: `Tâche déléguée à ${newUser.name}.`,
+        type: 'delegation',
+        relatedTaskId: task._id,
+        relatedUserId: newUser._id
+    });
+}
+   
     }
+
+    // Ajout notification quand l'auditeur accepte une tâche (status 'accepted')
+    if (status === 'accepted') {
+        await createNotification({
+            userId: assignment.userId,
+            title: "Tâche acceptée",
+            message: `Vous avez accepté la tâche "${task.name}" le ${new Date().toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}`,
+            type: "assignment",
+            relatedTaskId: task._id
+        });
+    }
+
 
     res.json({
       message: `Proposition ${status === 'accepted' ? 'acceptée' : status === 'refused' ? 'refusée' : 'déléguée'} avec succès`,

@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-
+const createNotification = require('../utils/createNotification'); // ← Import ajouté pour notifier
 
 const generateToken = (user) => {
     return jwt.sign({
@@ -10,7 +10,6 @@ const generateToken = (user) => {
         process.env.JWT_SECRET, { expiresIn: '30d' }
     );
 };
-
 
 exports.makeFirstSuperAdmin = async(req, res) => {
     try {
@@ -89,7 +88,7 @@ exports.register = async(req, res) => {
     }
 };
 
-// Login
+// Login (ajout de notification au login réussi)
 exports.login = async(req, res) => {
     try {
         const { email, password } = req.body;
@@ -99,6 +98,23 @@ exports.login = async(req, res) => {
             if (!user.active) {
                 return res.status(401).json({ message: 'Compte désactivé' });
             }
+
+            // AJOUT : Créer notification pour le login
+            const loginTime = new Date().toLocaleString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            await createNotification({
+                userId: user._id,
+                title: "Connexion réussie",
+                message: `Vous vous êtes connecté le ${loginTime}`,
+                type: "system"
+            });
 
             res.json({
                 _id: user._id,

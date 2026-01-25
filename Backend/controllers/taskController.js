@@ -1,20 +1,24 @@
 const Task = require('../models/Task');
 const cloudinary = require('cloudinary').v2;
+const createNotification = require('../utils/createNotification');
 
-
+// Fonction upload → plus de top-level await
 const uploadBase64ToCloudinary = async(base64String) => {
     if (!base64String || !base64String.startsWith('data:application/pdf;base64,')) {
         throw new Error('Format base64 invalide : doit commencer par data:application/pdf;base64,');
     }
-    return await cloudinary.uploader.upload(base64String, {
+
+    const result = await cloudinary.uploader.upload(base64String, {
         resource_type: 'raw',
         folder: 'tasks_admin_files',
         format: 'pdf',
-        access_mode: 'public', // ← Obligatoire
-        type: 'upload', // ← Ajoute si pas déjà
+        access_mode: 'public',
+        type: 'upload',
         overwrite: true,
-        use_filename: true // ← Optionnel : garde le nom original
+        use_filename: true
     });
+
+    return result;
 };
 
 // CREATE TASK (POST)
@@ -71,7 +75,7 @@ exports.createTask = async(req, res) => {
                 const result = await uploadBase64ToCloudinary(adminFile);
                 pdfUrl = result.secure_url;
                 pdfPublicId = result.public_id;
-                console.log('PDF uploadé avec succès :', pdfUrl); // log pour debug
+                console.log('PDF uploadé avec succès :', pdfUrl);
             } catch (uploadErr) {
                 console.error('Erreur upload PDF :', uploadErr);
                 return res.status(400).json({ message: 'Erreur upload PDF' });
@@ -92,12 +96,25 @@ exports.createTask = async(req, res) => {
             needsVehicle: needsVehicle === true,
             direction: direction && typeof direction === 'string' ? direction.trim() : '',
             isCommon: isCommon === true,
-            adminFile: pdfUrl, // garde si tu veux
-            pdfUrl, // IMPORTANT : on sauvegarde ici pour le bouton
+            adminFile: pdfUrl,
+            pdfUrl,
             pdfPublicId,
             createdBy: req.user._id,
             status: 'ouverte'
         });
+
+        // Notification (seulement si tâche assignée à quelqu’un)
+        // ← Tu peux l’appeler ici si besoin, ou dans un autre contrôleur
+        // Exemple :
+        // if (task.assignedTo) {
+        //     await createNotification({
+        //         userId: task.assignedTo,
+        //         title: "Nouvelle tâche assignée",
+        //         message: `Vous avez été assigné à la tâche : ${task.name}`,
+        //         type: "assignment",
+        //         relatedTaskId: task._id
+        //     });
+        // }
 
         res.status(201).json({
             message: 'Tâche créée avec succès',
@@ -133,7 +150,7 @@ exports.getTasks = async(req, res) => {
     }
 };
 
-// GET TASK BY ID (optionnel)
+// GET TASK BY ID
 exports.getTaskById = async(req, res) => {
     try {
         const task = await Task.findById(req.params.id)
@@ -145,20 +162,20 @@ exports.getTaskById = async(req, res) => {
     }
 };
 
-// UPDATE TASK (optionnel)
+// UPDATE TASK
 exports.updateTask = async(req, res) => {
     try {
         const task = await Task.findById(req.params.id);
         if (!task) return res.status(404).json({ message: 'Tâche non trouvée' });
 
-        // Mise à jour PDF si nouveau fichier envoyé
+        // Mise à jour PDF si nouveau fichier
         if (req.body.adminFile && req.body.adminFile.startsWith('data:application/pdf;base64,')) {
             try {
                 const result = await uploadBase64ToCloudinary(req.body.adminFile);
                 task.pdfUrl = result.secure_url;
                 task.pdfPublicId = result.public_id;
                 task.adminFile = result.secure_url;
-                console.log('PDF mis à jour avec succès :', task.pdfUrl);
+                console.log('PDF mis à jour :', task.pdfUrl);
             } catch (uploadErr) {
                 console.error('Erreur update PDF :', uploadErr);
                 return res.status(400).json({ message: 'Erreur update PDF' });
@@ -168,6 +185,23 @@ exports.updateTask = async(req, res) => {
         // Mise à jour des autres champs
         Object.assign(task, req.body);
         await task.save();
+        // Vérifier si modification impacte assignedTo ou champs critiques
+        const criticalFields = ['assignedTo', 'startDate', 'endDate', 'description']; // À adapter
+        const hasCriticalChange = criticalFields.some(field => req.body[field] !== undefined);
+
+        if (hasCriticalChange && task.assignedTo.length > 0) {
+            for (const assign of task.assignedTo) {
+                if (assign.status === 'accepted' || assign.status === 'pending') {
+                    await createNotification({
+                        userId: assign.user,
+                        title: `Modification de tâche "${task.name}"`,
+                        message: `La tâche a été modifiée. Vérifiez les détails.${req.body.description ? '\nNouvelle description: ' + req.body.description : ''}`,
+                        type: 'modification',
+                        relatedTaskId: task._id
+                    });
+                }
+            }
+        }
 
         res.json({ message: 'Tâche mise à jour', task });
     } catch (error) {
@@ -175,7 +209,7 @@ exports.updateTask = async(req, res) => {
     }
 };
 
-// DELETE TASK (optionnel)
+// DELETE TASK
 exports.deleteTask = async(req, res) => {
     try {
         const task = await Task.findByIdAndDelete(req.params.id);

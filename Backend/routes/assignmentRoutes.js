@@ -7,6 +7,23 @@ const {
     autoAssignment,
     respondToAssignment
 } = require('../controllers/assignmentController');
+// GET - Affectations actives pour user connecté (pending + accepted)
+router.get('/my-assignments', protect, async(req, res) => {
+    try {
+        const assignments = await require('../models/Assignment')
+            .find({
+                userId: req.user._id,
+                status: { $in: ['pending', 'accepted'] }
+            })
+            .populate('taskId', 'name description startDate endDate places remunerated remunerationAmount')
+            .sort({ createdAt: -1 });
+
+        res.json(assignments);
+    } catch (error) {
+        console.error('Erreur my-assignments :', error);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+});
 
 // POST - Assignation manuelle
 router.post('/manual', protect, admin('admin', 'superAdmin'), manualAssignment);

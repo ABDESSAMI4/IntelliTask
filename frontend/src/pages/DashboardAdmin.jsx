@@ -14,9 +14,9 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { Link } from 'react-router-dom'; // ← Ajouté pour le bouton
 
 // Export PDF/Excel
-
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
@@ -75,43 +75,42 @@ const DashboardAdmin = () => {
   }, []);
 
   // ==================== EXPORT PDF ====================
- const exportPDF = () => {
-  const doc = new jsPDF('p', 'mm', 'a4');
-  
-  // Titre
-  doc.setFontSize(18);
-  doc.text('Rapport TaskMe - Dashboard Administrateur', 14, 20);
-  
-  doc.setFontSize(12);
-  doc.text(`Date : ${new Date().toLocaleDateString('fr-FR')}`, 14, 30);
+  const exportPDF = () => {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    // Titre
+    doc.setFontSize(18);
+    doc.text('Rapport TaskMe - Dashboard Administrateur', 14, 20);
+    
+    doc.setFontSize(12);
+    doc.text(`Date : ${new Date().toLocaleDateString('fr-FR')}`, 14, 30);
 
-  // Stats
-  doc.setFontSize(14);
-  doc.text('Statistiques Générales', 14, 45);
-  doc.setFontSize(11);
-  doc.text(`• Tâches totales : ${stats.totalTasks}`, 20, 55);
-  doc.text(`• Tâches en attente : ${stats.pendingTasks}`, 20, 65);
-  doc.text(`• Tâches acceptées : ${stats.acceptedTasks}`, 20, 75);
+    // Stats
+    doc.setFontSize(14);
+    doc.text('Statistiques Générales', 14, 45);
+    doc.setFontSize(11);
+    doc.text(`• Tâches totales : ${stats.totalTasks}`, 20, 55);
+    doc.text(`• Tâches en attente : ${stats.pendingTasks}`, 20, 65);
+    doc.text(`• Tâches acceptées : ${stats.acceptedTasks}`, 20, 75);
 
-  // Tableau
-  const tableData = stats.tasksByUser.map((u, i) => [
-    i + 1,
-    u.name,
-    u.count
-  ]);
+    // Tableau
+    const tableData = stats.tasksByUser.map((u, i) => [
+      i + 1,
+      u.name,
+      u.count
+    ]);
 
-  // Utilise autoTable comme fonction séparée
-  autoTable(doc, {
-    head: [['#', 'Employé', 'Tâches acceptées']],
-    body: tableData,
-    startY: 90,
-    theme: 'grid',
-    headStyles: { fillColor: [54, 162, 235] },
-    styles: { fontSize: 10 }
-  });
+    autoTable(doc, {
+      head: [['#', 'Employé', 'Tâches acceptées']],
+      body: tableData,
+      startY: 90,
+      theme: 'grid',
+      headStyles: { fillColor: [54, 162, 235] },
+      styles: { fontSize: 10 }
+    });
 
-  doc.save('taskme_dashboard_admin.pdf');
-};
+    doc.save('taskme_dashboard_admin.pdf');
+  };
 
   // ==================== EXPORT EXCEL ====================
   const exportExcel = () => {
@@ -174,14 +173,19 @@ const DashboardAdmin = () => {
     <div className="container py-5">
       <h2 className="text-center mb-4 text-primary fw-bold">Dashboard Administrateur</h2>
 
-      {/* Boutons Export */}
+      {/* Boutons Export + Nouveau bouton Gestion Auditeurs */}
       <div className="text-center mb-5">
         <button onClick={exportPDF} className="btn btn-danger btn-lg me-4 px-5">
           📄 Exporter en PDF
         </button>
-        <button onClick={exportExcel} className="btn btn-success btn-lg px-5">
+        <button onClick={exportExcel} className="btn btn-success btn-lg me-4 px-5">
           📊 Exporter en Excel
         </button>
+
+        {/* BOUTON AJOUTÉ : Gestion des auditeurs */}
+        <Link to="/admin/users" className="btn btn-primary btn-lg px-5">
+          👥 Gérer les auditeurs
+        </Link>
       </div>
 
       {/* Cartes Stats */}
