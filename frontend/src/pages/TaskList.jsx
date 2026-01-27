@@ -1,13 +1,12 @@
-// src/pages/TaskList.jsx - Avec Chat par tâche sous chaque carte
 import { useEffect, useState } from 'react';
 import API from '../services/api';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -46,6 +45,20 @@ const TaskList = () => {
     }
   };
 
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm('⚠️ Voulez-vous vraiment supprimer cette tâche ?')) {
+      return;
+    }
+
+    try {
+      await API.delete(`/tasks/${taskId}`);
+      toast.success('✅ Tâche supprimée avec succès');
+      setTasks(prev => prev.filter(task => task._id !== taskId));
+    } catch (err) {
+      toast.error('❌ Erreur lors de la suppression de la tâche');
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-5">
@@ -76,12 +89,20 @@ const TaskList = () => {
           {tasks.map(task => (
             <div key={task._id} className="col-12">
               <div className="card shadow-lg border-0 mb-4">
-                <div className="card-header bg-gradient bg-primary text-white">
+                <div className="card-header bg-gradient bg-primary text-white d-flex justify-content-between align-items-center">
                   <h5 className="mb-0">{task.name}</h5>
+                  <div>
+                    <button
+                      className="btn btn-sm btn-danger me-2"
+                      onClick={() => handleDeleteTask(task._id)}
+                    >
+                      🗑 Supprimer
+                    </button>
+                   
+                  </div>
                 </div>
                 <div className="card-body">
                   <div className="row">
-                    {/* Infos tâche à gauche */}
                     <div className="col-lg-5">
                       <p className="card-text">{task.description}</p>
                       <hr />
@@ -92,21 +113,18 @@ const TaskList = () => {
                         <p className="mb-1"><strong>Spécialités :</strong> {task.specialties?.join(', ') || 'Aucune'}</p>
                       </div>
 
-                      {/* BOUTON PDF CORRIGÉ – SIMPLE ET PUBLIC */}
-                    {/* AFFICHAGE PDF - UTILISE pdfUrl OU adminFile */}
-{(task.adminFile || task.pdfUrl) && (
-  <div className="mt-3">
-    <a 
-      href={task.pdfUrl || task.adminFile}  // ← priorise pdfUrl si existe, sinon adminFile
-      target="_blank" 
-      rel="noopener noreferrer" 
-      className="btn btn-sm btn-info"
-    >
-      📄 Voir PDF joint
-    </a>
-  </div>
-)}
-     
+                      {(task.adminFile || task.pdfUrl) && (
+                        <div className="mt-3">
+                          <a 
+                            href={task.pdfUrl || task.adminFile}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-sm btn-info"
+                          >
+                            📄 Voir PDF joint
+                          </a>
+                        </div>
+                      )}
 
                       <div className="mt-4">
                         <div className="btn-group w-100" role="group">

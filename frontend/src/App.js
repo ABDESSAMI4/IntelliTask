@@ -26,6 +26,7 @@ import VehicleList from './pages/VehicleList';
 import RequestVehicle from './pages/RequestVehicle';
 import VehicleRequestsAdmin from './pages/VehicleRequestsAdmin';
 import Settings from './pages/Settings';
+import MyAssignments from './pages/MyAssignments';
 
 // Composants
 import Header from './components/layout/Header';
@@ -171,6 +172,11 @@ function App() {
                     element = { < Navigate to = "/login"
                         replace / >
                     }
+                    />
+
+                    <
+                    Route path = "/my-assignments"
+                    element = { < MyAssignments / > }
                     />
 
                     <
