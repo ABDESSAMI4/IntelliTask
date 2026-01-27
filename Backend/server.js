@@ -62,7 +62,16 @@ app.use(cors({
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     optionsSuccessStatus: 204,
 }));
-
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/vehicles', require('./routes/vehicleRoutes'));
+app.use('/api/assignments', require('./routes/assignmentRoutes'));
+app.use('/api/history', require('./routes/historyRoutes'));
+app.use('/api/messages', require('./routes/messageRoutes'));
+app.use('/api/vehicle-assignments', require('./routes/vehicleAssignmentRoutes'));
+app.use('/api/vehicle-requests', require('./routes/vehicleRequestRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -77,16 +86,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/tasks', require('./routes/taskRoutes'));
-app.use('/api/vehicles', require('./routes/vehicleRoutes'));
-app.use('/api/assignments', require('./routes/assignmentRoutes'));
-app.use('/api/history', require('./routes/historyRoutes'));
-app.use('/api/messages', require('./routes/messageRoutes'));
-app.use('/api/vehicle-assignments', require('./routes/vehicleAssignmentRoutes'));
-app.use('/api/vehicle-requests', require('./routes/vehicleRequestRoutes'));
-app.use('/api/notifications', require('./routes/notificationRoutes'));
+
 
 
 //--------
