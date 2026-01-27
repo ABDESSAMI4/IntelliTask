@@ -1,5 +1,5 @@
-// src/pages/MyAssignments.jsx
-import { useEffect, useState, useContext } from 'react';
+// src/pages/MyAssignments.jsx - Version corrigée ESLint
+import { useEffect, useState, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
 import { AuthContext } from '../context/AuthContext';
@@ -12,7 +12,7 @@ const MyAssignments = () => {
   
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // 'all', 'pending', 'accepted', 'refused', 'delegated'
+  const [filter, setFilter] = useState('all');
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [responseData, setResponseData] = useState({
@@ -24,19 +24,19 @@ const MyAssignments = () => {
   const [availableUsers, setAvailableUsers] = useState([]);
 
   // Récupérer les affectations de l'utilisateur
-  const fetchAssignments = async () => {
+  const fetchAssignments = useCallback(async () => {
     try {
-      const res = await API.get('/assignments/my-assignments');
+      const res = await API.get('/assignments');
       setAssignments(res.data || []);
       setLoading(false);
     } catch (err) {
       toast.error('Impossible de charger vos affectations');
       setLoading(false);
     }
-  };
+  }, []);
 
   // Récupérer les utilisateurs disponibles pour délégation
-  const fetchAvailableUsers = async () => {
+  const fetchAvailableUsers = useCallback(async () => {
     try {
       const res = await API.get('/users');
       // Filtrer les utilisateurs actifs et différents de l'utilisateur courant
@@ -49,32 +49,35 @@ const MyAssignments = () => {
     } catch (err) {
       console.error('Erreur chargement utilisateurs pour délégation:', err);
     }
-  };
+  }, [user.id]);
 
   useEffect(() => {
     fetchAssignments();
     fetchAvailableUsers();
     
     // Écoute Socket.io pour les nouvelles affectations
-    socket.on('newAssignment', (data) => {
+    const handleNewAssignment = (data) => {
       toast.info(`Nouvelle affectation: ${data.taskName || 'Nouvelle tâche'}`);
-      fetchAssignments(); // Rafraîchir la liste
-    });
+      fetchAssignments();
+    };
 
     // Écoute les modifications de tâches
-    socket.on('taskModified', (data) => {
+    const handleTaskModified = (data) => {
       const affectedAssignment = assignments.find(a => a.taskId?._id === data.taskId);
       if (affectedAssignment) {
         toast.warning(`⚠️ Tâche modifiée: ${data.taskName || 'Tâche'}`);
-        fetchAssignments(); // Rafraîchir
+        fetchAssignments();
       }
-    });
+    };
+
+    socket.on('newAssignment', handleNewAssignment);
+    socket.on('taskModified', handleTaskModified);
 
     return () => {
-      socket.off('newAssignment');
-      socket.off('taskModified');
+      socket.off('newAssignment', handleNewAssignment);
+      socket.off('taskModified', handleTaskModified);
     };
-  }, []);
+  }, [assignments, fetchAssignments, fetchAvailableUsers]);
 
   // Ouvrir modal de réponse
   const openResponseModal = (assignment) => {
@@ -117,11 +120,13 @@ const MyAssignments = () => {
         case 'delegated':
           message = '🔄 Affectation déléguée';
           break;
+        default:
+          message = 'Réponse enregistrée';
       }
       
       toast.success(message);
       setShowResponseModal(false);
-      fetchAssignments(); // Rafraîchir la liste
+      fetchAssignments();
       
       // Si délégation, notifier le nouvel utilisateur via Socket.io
       if (responseData.status === 'delegated' && responseData.delegatedTo) {
@@ -238,7 +243,11 @@ const MyAssignments = () => {
       {filteredAssignments.length === 0 ? (
         <div className="alert alert-info text-center py-5 shadow">
           <div className="display-1 mb-4">📭</div>
-          <h4>Aucune affectation {filter !== 'all' ? `avec le statut "${filter}"` : ''}</h4>
+          <h4>
+            {filter === 'all' 
+              ? 'Aucune affectation' 
+              : `Aucune affectation avec le statut "${filter}"`}
+          </h4>
           <p className="mb-0">
             {filter === 'pending' 
               ? 'Aucune tâche en attente de réponse' 
@@ -545,8 +554,8 @@ const MyAssignments = () => {
                   className="btn btn-primary"
                   onClick={handleResponse}
                   disabled={
-                    responseData.status === 'refused' && !responseData.justification.trim() ||
-                    responseData.status === 'delegated' && !responseData.delegatedTo
+                    (responseData.status === 'refused' && !responseData.justification.trim()) ||
+                    (responseData.status === 'delegated' && !responseData.delegatedTo)
                   }
                 >
                   Confirmer la réponse
