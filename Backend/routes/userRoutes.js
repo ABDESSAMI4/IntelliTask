@@ -16,9 +16,9 @@ const {
 
 // Routes protégées admin/superAdmin
 router.get('/', protect, admin('admin', 'superAdmin'), getAllUsers);
-router.put('/:id', protect, admin(['admin', 'superAdmin']), updateUser);
-router.patch('/:id/toggle-active', protect, admin(['admin', 'superAdmin']), toggleActive);
-router.delete('/:id', protect, admin(['superAdmin']), deleteUser);
+router.put('/:id', protect, admin('admin', 'superAdmin'), updateUser);
+router.patch('/:id/toggle-active', protect, admin('admin', 'superAdmin'), toggleActive);
+router.delete('/:id', protect, admin('superAdmin'), deleteUser);
 
 // Route création auditeur (protégée admin/superAdmin)
 //router.post('/create-auditor', protect, admin(['admin', 'superAdmin']), createAuditor);
