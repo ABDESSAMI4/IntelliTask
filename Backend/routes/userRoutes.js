@@ -14,6 +14,7 @@ const {
 
 } = require('../controllers/userController');
 
+
 // Routes protégées admin/superAdmin
 router.get('/', protect, admin('admin', 'superAdmin'), getAllUsers);
 router.put('/:id', protect, admin('admin', 'superAdmin'), updateUser);

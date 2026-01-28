@@ -1,14 +1,21 @@
 // src/pages/DashboardUser.jsx - Utilise le bouton chat existant (pas de nouveau bouton)
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import API from '../services/api';
 import { AuthContext } from '../context/AuthContext';
+import { Modal, Button, Form } from 'react-bootstrap'; // ← Ajout pour modal et form
 
 const DashboardUser = () => {
   const { user } = useContext(AuthContext);
   const [pendingTasks, setPendingTasks] = useState([]);
   const [myVehicles, setMyVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // États pour délégation
+  const [showDelegateModal, setShowDelegateModal] = useState(false);
+  const [currentAssignmentId, setCurrentAssignmentId] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [auditors, setAuditors] = useState([]); // Liste des auditeurs (role 'user')
 
   const fetchMyTasks = async () => {
     try {
@@ -29,14 +36,31 @@ const DashboardUser = () => {
     }
   };
 
+  // Fetch liste auditeurs (role 'user', sauf soi-même)
+  const fetchAvailableUsers = useCallback(async () => {
+    try {
+      const res = await API.get('/users');
+      // Filtrer les utilisateurs actifs et différents de l'utilisateur courant
+      const filtered = res.data.filter(u => 
+        u._id !== user.id && 
+        u.active && 
+        u.role === 'user'
+      );
+      setAuditors(filtered); // ← Changé à setAuditors
+    } catch (err) {
+      console.error('Erreur chargement utilisateurs pour délégation:', err);
+      toast.error('Erreur chargement auditeurs pour délégation');
+    }
+  }, [user.id]);
+
   useEffect(() => {
     const loadAll = async () => {
       setLoading(true);
-      await Promise.all([fetchMyTasks(), fetchMyVehicles()]);
+      await Promise.all([fetchMyTasks(), fetchMyVehicles(), fetchAvailableUsers()]); // ← Ajout fetchAvailableUsers
       setLoading(false);
     };
     loadAll();
-  }, []);
+  }, [fetchAvailableUsers]);
 
   const handleResponse = async (assignmentId, status, justification = '', delegatedTo = null) => {
     try {
@@ -67,10 +91,19 @@ const DashboardUser = () => {
     }
   };
 
+  // Délégation avec modal et select par nom
   const handleDelegate = (assignmentId) => {
-    const delegatedTo = prompt('ID de l\'utilisateur à qui déléguer :');
-    if (delegatedTo && delegatedTo.trim()) {
-      handleResponse(assignmentId, 'delegated', '', delegatedTo.trim());
+    setCurrentAssignmentId(assignmentId);
+    setSelectedUserId('');
+    setShowDelegateModal(true);
+  };
+
+  const confirmDelegate = () => {
+    if (selectedUserId) {
+      handleResponse(currentAssignmentId, 'delegated', '', selectedUserId);
+      setShowDelegateModal(false);
+    } else {
+      toast.warning('Veuillez sélectionner un auditeur');
     }
   };
 
@@ -231,6 +264,37 @@ const DashboardUser = () => {
           )}
         </div>
       </div>
+
+      {/* Modal pour délégation par nom */}
+      <Modal show={showDelegateModal} onHide={() => setShowDelegateModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Déléguer la tâche</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group controlId="delegateSelect">
+            <Form.Label>Sélectionnez un auditeur par nom :</Form.Label>
+            <Form.Select 
+              value={selectedUserId}
+              onChange={(e) => setSelectedUserId(e.target.value)}
+            >
+              <option value="">-- Choisissez un auditeur --</option>
+              {auditors.map((auditor) => (
+                <option key={auditor._id} value={auditor._id}>
+                  {auditor.name} ({auditor.email})
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDelegateModal(false)}>
+            Annuler
+          </Button>
+          <Button variant="warning" onClick={confirmDelegate}>
+            Déléguer
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Le bouton chat flottant existant dans ton app (en bas à droite) 
           va maintenant ouvrir la Discussion générale.
