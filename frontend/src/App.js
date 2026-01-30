@@ -18,6 +18,7 @@ import DashboardAdmin from './pages/DashboardAdmin';
 import DashboardUser from './pages/DashboardUser';
 import TaskList from './pages/TaskList';
 import TaskCreate from './pages/TaskCreate';
+import TaskEdit from './pages/TaskEdit'; // AJOUT: Import de TaskEdit
 import UserList from './pages/UserList';
 import HistoryGlobal from './pages/HistoryGlobal';
 import HistoryUser from './pages/HistoryUser';
@@ -40,7 +41,8 @@ import socket from './socket';
 
 // Context – Imports corrigés (named si export const)
 import { AuthProvider } from './context/AuthContext'; // named import
-import { ThemeProvider } from './context/ThemeContext'; // named import
+import { ThemeProvider } from './context/ThemeContext';
+// named import
 
 const AppLayout = ({ children }) => {
     const location = useLocation();
@@ -149,6 +151,9 @@ function App() {
                     /> <
                     Route path = "/admin/tasks/create"
                     element = { < TaskCreate / > }
+                    /> <
+                    Route path = "/admin/tasks/edit/:id" // AJOUT: Route pour modifier une tâche
+                    element = { < TaskEdit / > }
                     /> <
                     Route path = "/admin/users"
                     element = { < UserList / > }

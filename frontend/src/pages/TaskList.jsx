@@ -45,6 +45,11 @@ const TaskList = () => {
     }
   };
 
+  // Fonction pour naviguer vers la page de modification
+  const handleEditTask = (taskId) => {
+    navigate(`/admin/tasks/edit/${taskId}`);
+  };
+
   const handleDeleteTask = async (taskId) => {
     if (!window.confirm('⚠️ Voulez-vous vraiment supprimer cette tâche ?')) {
       return;
@@ -92,13 +97,23 @@ const TaskList = () => {
                 <div className="card-header bg-gradient bg-primary text-white d-flex justify-content-between align-items-center">
                   <h5 className="mb-0">{task.name}</h5>
                   <div>
+                    {/* Bouton Modifier */}
                     <button
-                      className="btn btn-sm btn-danger me-2"
+                      className="btn btn-sm btn-warning me-2"
+                      onClick={() => handleEditTask(task._id)}
+                      title="Modifier cette tâche"
+                    >
+                      ✏️ Modifier
+                    </button>
+                    
+                    {/* Bouton Supprimer */}
+                    <button
+                      className="btn btn-sm btn-danger"
                       onClick={() => handleDeleteTask(task._id)}
+                      title="Supprimer cette tâche"
                     >
                       🗑 Supprimer
                     </button>
-                   
                   </div>
                 </div>
                 <div className="card-body">
