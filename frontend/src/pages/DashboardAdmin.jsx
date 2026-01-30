@@ -182,10 +182,7 @@ const DashboardAdmin = () => {
           📊 Exporter en Excel
         </button>
 
-        {/* BOUTON AJOUTÉ : Gestion des auditeurs */}
-        <Link to="/admin/users" className="btn btn-primary btn-lg px-5">
-          👥 Gérer les auditeurs
-        </Link>
+      
       </div>
 
       {/* Cartes Stats */}

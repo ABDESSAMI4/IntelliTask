@@ -352,7 +352,7 @@ const Login = () => {
                 {isLogin ? t('sign_in') : t('create_account')}
               </button>
 
-              <div className="text-center">
+              {/*<div className="text-center">
                 <button
                   type="button"
                   className="btn btn-link text-decoration-none fw-bold"
@@ -360,7 +360,7 @@ const Login = () => {
                 >
                   {isLogin ? t('no_account') : t('already_account')}
                 </button>
-              </div>
+              </div>*/}
             </form>
           </div>
         </div>
