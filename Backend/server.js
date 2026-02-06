@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 const express = require('express');
-
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
@@ -9,14 +8,16 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 
-// AJOUT POUR LE CRON (auto-refus 24h)
+// Pour le cron (auto-refus après 24h)
 const cron = require('node-cron');
 const Assignment = require('./models/Assignment');
 const Task = require('./models/Task');
 const User = require('./models/User');
 const sendNotification = require('./utils/notification');
 
-
+// ────────────────────────────────────────────────────────────────
+// Vérification des variables d'environnement obligatoires
+// ────────────────────────────────────────────────────────────────
 const requiredEnv = ['JWT_SECRET', 'MONGO_URI', 'PORT'];
 const missing = requiredEnv.filter(key => !process.env[key]);
 if (missing.length > 0) {
@@ -24,34 +25,32 @@ if (missing.length > 0) {
     process.exit(1);
 }
 
+// ────────────────────────────────────────────────────────────────
+// Initialisation de l'application Express
+// ────────────────────────────────────────────────────────────────
 const app = express();
 
-
+// Configuration Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
 console.log('🔑 Cloudinary configuré avec succès');
 
-
+// Middleware JSON (limite augmentée pour les fichiers base64)
 app.use(express.json({ limit: '10mb' }));
 
-
+// Liste des origines autorisées pour CORS
 const allowedOrigins = [
     'http://localhost:3000',
     'https://intelli-task-t3cz.vercel.app',
-
 ];
 
+// Configuration CORS
 app.use(cors({
     origin: (origin, callback) => {
-
-        if (!origin) return callback(null, true);
-
-
-        if (allowedOrigins.includes(origin)) {
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Non autorisé par CORS'));
@@ -62,6 +61,10 @@ app.use(cors({
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
     optionsSuccessStatus: 204,
 }));
+
+// ────────────────────────────────────────────────────────────────
+// Routes de l’API
+// ────────────────────────────────────────────────────────────────
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
@@ -73,9 +76,10 @@ app.use('/api/vehicle-assignments', require('./routes/vehicleAssignmentRoutes'))
 app.use('/api/vehicle-requests', require('./routes/vehicleRequestRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 
+// Dossier statique pour les uploads (si tu en utilises)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
+// Route de test racine
 app.get('/', (req, res) => {
     res.status(200).json({
         message: '🚀 API IntelliTask est en marche !',
@@ -85,11 +89,35 @@ app.get('/', (req, res) => {
     });
 });
 
+// ────────────────────────────────────────────────────────────────
+// NOUVELLE ROUTE : Liste des auditeurs pour la délégation
+// Accessible à tous les utilisateurs connectés (via protect)
+// ────────────────────────────────────────────────────────────────
+const { protect } = require('./middleware/authMiddleware');
 
+app.get('/api/users/auditors', protect, async(req, res) => {
+    try {
+        const auditors = await User.find({
+                role: 'user',
+                active: true,
+                _id: { $ne: req.user._id }, // exclure soi-même
+            })
+            .select('name email specialty grade phone active')
+            .sort('name');
 
+        res.status(200).json(auditors);
+    } catch (error) {
+        console.error('Erreur /api/users/auditors :', error);
+        res.status(500).json({
+            message: 'Erreur serveur lors du chargement des auditeurs',
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
+        });
+    }
+});
 
-
-//--------
+// ────────────────────────────────────────────────────────────────
+// Gestion des routes non trouvées (404)
+// ────────────────────────────────────────────────────────────────
 app.use('*', (req, res) => {
     res.status(404).json({
         message: 'Route non trouvée',
@@ -98,8 +126,9 @@ app.use('*', (req, res) => {
     });
 });
 
-// =========================
-
+// ────────────────────────────────────────────────────────────────
+// Connexion MongoDB
+// ────────────────────────────────────────────────────────────────
 mongoose
     .connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB connecté avec succès'))
@@ -108,8 +137,9 @@ mongoose
         process.exit(1);
     });
 
-// =========================
-
+// ────────────────────────────────────────────────────────────────
+// Socket.io
+// ────────────────────────────────────────────────────────────────
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -133,45 +163,49 @@ io.on('connection', (socket) => {
     });
 });
 
-
 app.set('io', io);
 
-// =========================
-
-// AJOUT DU CRON POUR AUTO-REFUS APRÈS 24H + RETOUR À SENDER
-cron.schedule('0 * * * *', async() => { // Toutes les heures
+// ────────────────────────────────────────────────────────────────
+// CRON : Auto-refus des tâches pending après 24h
+// Exécuté toutes les heures
+// ────────────────────────────────────────────────────────────────
+cron.schedule('0 * * * *', async() => {
     console.log('Cron : vérification tâches pending > 24h');
 
-    const pending = await Assignment.find({
-        status: 'pending',
-        createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } // > 24h
-    }).populate('taskId');
+    try {
+        const pending = await Assignment.find({
+            status: 'pending',
+            createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        }).populate('taskId');
 
-    for (const ass of pending) {
-        ass.status = 'refused';
-        ass.justification = 'Délai de 24h dépassé sans réponse';
-        await ass.save();
+        for (const ass of pending) {
+            ass.status = 'refused';
+            ass.justification = 'Délai de 24h dépassé sans réponse';
+            await ass.save();
 
-        // Retour à la personne de départ (créateur de la tâche)
-        const task = ass.taskId;
-        task.assignedTo = [{ user: task.createdBy, status: 'refused' }];
-        await task.save();
+            const task = ass.taskId;
+            task.assignedTo = [{ user: task.createdBy, status: 'refused' }];
+            await task.save();
 
-        // Notification au créateur
-        const creator = await User.findById(task.createdBy);
-        if (creator) {
-            sendNotification(creator,
-                `Tâche "${task.name}" refusée automatiquement (délai dépassé). Retournée à vous.`,
-                'email'
-            );
+            const creator = await User.findById(task.createdBy);
+            if (creator) {
+                sendNotification(
+                    creator,
+                    `Tâche "${task.name}" refusée automatiquement (délai dépassé). Retournée à vous.`,
+                    'email'
+                );
+            }
+
+            console.log(`Tâche ${task._id} refusée auto + retournée à créateur`);
         }
-
-        console.log(`Tâche ${task._id} refusée auto + retournée à créateur`);
+    } catch (error) {
+        console.error('Erreur dans le cron auto-refus :', error);
     }
 });
 
-// =========================
-
+// ────────────────────────────────────────────────────────────────
+// Gestion globale des erreurs
+// ────────────────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
     console.error('🚨 Erreur serveur :', err);
 
@@ -181,8 +215,9 @@ app.use((err, req, res, next) => {
     });
 });
 
-// =========================
-
+// ────────────────────────────────────────────────────────────────
+// Lancement du serveur
+// ────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, '0.0.0.0', () => {
