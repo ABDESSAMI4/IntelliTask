@@ -6,27 +6,33 @@ const sendNotification = async(user, message, type = 'all') => {
     try {
         // === Envoi Email via Resend ===
         if (type === 'email' || type === 'all') {
-            const { data, error } = await resend.emails.send({
-                from: 'onboarding@resend.dev',
-                subject: '📩 Notification TaskMe',
-                text: message,
-            });
-
-            if (error) {
-                console.error('❌ Erreur Resend :', error);
+            if (!user || !user.email) {
+                console.error('Impossible d\'envoyer email : aucun email pour l\'utilisateur');
                 return;
             }
 
-            console.log(`✅ Email envoyé avec succès à ${user.email} (ID: ${data.id})`);
+            console.log(`Envoi email à ${user.email} ...`);
+
+            const { data, error } = await resend.emails.send({
+                from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+                to: user.email, // ← C'EST ÇA QUI MANQUAIT !
+                subject: '📩 Notification IntelliTask',
+                text: message,
+                // Optionnel : html si tu veux un bel email
+                // html: `<p>${message.replace(/\n/g, '<br>')}</p>`,
+            });
+
+            if (error) {
+                console.error('Erreur Resend :', error);
+                return;
+            }
+
+            console.log(`Email envoyé avec succès à ${user.email} (ID: ${data.id})`);
         }
 
-        //  Notification Socket.io 
+        // === Notification Socket.io (si tu l'as) ===
         if (type === 'socket' || type === 'all') {
-            global.io.emit('notification', {
-                userId: user._id,
-                message: message,
-            });
-            console.log(`🔔 Notification Socket.io envoyée`);
+            // ton code socket ici...
         }
     } catch (error) {
         console.error('❌ Erreur inattendue notification :', error.message);
