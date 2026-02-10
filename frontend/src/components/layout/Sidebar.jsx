@@ -178,13 +178,23 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
                 {/* Lien Paramètres – UNIQUEMENT pour admin/superAdmin */}
                 <li className="mb-3">
                   <Link
-                    to="/admin/settings"
+                    to="/superAdmin/settings"
                     className="text-white text-decoration-none d-block py-3 px-4 rounded hover-bg-primary-dark transition-all"
                     onClick={toggleSidebar}
                   >
                     ⚙️ {t('settings') || 'Paramètres'}
                   </Link>
                 </li>
+                 {/* Nouveau : Mes Affectations (visibilité pour membres concernés) */}
+            <li className="mb-3">
+              <Link
+                to="/admin/my-assignments" // Route frontend vers page listant affectations (pending/accepted)
+                className="text-white text-decoration-none d-block py-3 px-4 rounded hover-bg-primary-dark transition-all"
+                onClick={toggleSidebar}
+              >
+                📋 Mes Affectations
+              </Link>
+            </li>
               </>
             ) : (
               /* Menu Utilisateur normal */
@@ -212,16 +222,7 @@ const Sidebar = ({ isOpen, toggleSidebar, user, onLogout }) => {
               </Link>
             </li>
 
-            {/* Nouveau : Mes Affectations (visibilité pour membres concernés) */}
-            <li className="mb-3">
-              <Link
-                to="/my-assignments" // Route frontend vers page listant affectations (pending/accepted)
-                className="text-white text-decoration-none d-block py-3 px-4 rounded hover-bg-primary-dark transition-all"
-                onClick={toggleSidebar}
-              >
-                📋 Mes Affectations
-              </Link>
-            </li>
+           
 
             {/* Nouveau : Notifications (avec cloche et badge) */}
             <li className="mb-3">

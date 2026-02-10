@@ -28,6 +28,7 @@ import RequestVehicle from './pages/RequestVehicle';
 import VehicleRequestsAdmin from './pages/VehicleRequestsAdmin';
 import Settings from './pages/Settings';
 import MyAssignments from './pages/MyAssignments';
+import AdminPanel from './pages/AdminPanel';
 
 // Composants
 import Header from './components/layout/Header';
@@ -146,20 +147,20 @@ function App() {
                     Route path = "/admin/dashboard"
                     element = { < DashboardAdmin / > }
                     /> <
+                    Route path = "/admin/users"
+                    element = { < UserList / > }
+                    /> <
+                    Route path = "/admin/history"
+                    element = { < HistoryGlobal / > }
+                    /> <
                     Route path = "/admin/tasks"
                     element = { < TaskList / > }
                     /> <
                     Route path = "/admin/tasks/create"
                     element = { < TaskCreate / > }
                     /> <
-                    Route path = "/admin/tasks/edit/:id" // AJOUT: Route pour modifier une tâche
+                    Route path = "/admin/tasks/edit/:id"
                     element = { < TaskEdit / > }
-                    /> <
-                    Route path = "/admin/users"
-                    element = { < UserList / > }
-                    /> <
-                    Route path = "/admin/history"
-                    element = { < HistoryGlobal / > }
                     /> <
                     Route path = "/admin/vehicles"
                     element = { < VehicleList / > }
@@ -167,58 +168,68 @@ function App() {
                     Route path = "/admin/vehicle-requests"
                     element = { < VehicleRequestsAdmin / > }
                     /> <
-                    Route path = "/admin/settings"
+                    Route path = "/superAdmin/settings"
                     element = { < Settings / > }
                     /> < /
                     Route >
 
                     <
-                    Route path = "/"
-                    element = { < Navigate to = "/login"
-                        replace / >
-                    }
-                    />
+                    Route element = { < ProtectedRoute allowedRoles = {
+                            ['superAdmin']
+                        }
+                        />}> <
+                        Route path = "/admin/panel"
+                        element = { < AdminPanel / > }
+                        /> < /
+                        Route >
 
-                    <
-                    Route path = "/my-assignments"
-                    element = { < MyAssignments / > }
-                    />
-
-                    <
-                    Route
-                    path = "*"
-                    element = { <
-                        div className = "container text-center py-5 mt-5" >
                         <
-                        h1 className = "display-1 text-danger fw-bold" > 404 < /h1> <
-                        h2 className = "mb-4" > Page non trouvée < /h2> <
-                        a href = "/login"
-                        className = "btn btn-primary btn-lg" >
-                        Retour à la connexion <
-                        /a> < /
-                        div >
-                    }
-                    /> < /
-                    Routes > <
-                    /AppLayout>
+                        Route path = "/"
+                        element = { < Navigate to = "/login"
+                            replace / >
+                        }
+                        />
 
-                    <
-                    ToastContainer
-                    position = "top-right"
-                    autoClose = { 5000 }
-                    hideProgressBar = { false }
-                    newestOnTop
-                    closeOnClick
-                    pauseOnHover
-                    pauseOnFocusLoss
-                    draggable
-                    theme = "light" /
-                    >
-                    <
-                    /Router> < /
-                    AuthProvider > <
-                    /ThemeProvider>
-                );
-            }
+                        <
+                        Route path = "/admin/my-assignments"
+                        element = { < MyAssignments / > }
+                        />
 
-            export default App;
+                        <
+                        Route
+                        path = "*"
+                        element = { <
+                            div className = "container text-center py-5 mt-5" >
+                            <
+                            h1 className = "display-1 text-danger fw-bold" > 404 < /h1> <
+                            h2 className = "mb-4" > Page non trouvée < /h2> <
+                            a href = "/login"
+                            className = "btn btn-primary btn-lg" >
+                            Retour à la connexion <
+                            /a> < /
+                            div >
+                        }
+                        /> < /
+                        Routes > <
+                        /AppLayout>
+
+                        <
+                        ToastContainer
+                        position = "top-right"
+                        autoClose = { 5000 }
+                        hideProgressBar = { false }
+                        newestOnTop
+                        closeOnClick
+                        pauseOnHover
+                        pauseOnFocusLoss
+                        draggable
+                        theme = "light" /
+                        >
+                        <
+                        /Router> < /
+                        AuthProvider > <
+                        /ThemeProvider>
+                    );
+                }
+
+                export default App;

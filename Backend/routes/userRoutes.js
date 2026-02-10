@@ -13,6 +13,7 @@ const {
     updateUser,
     toggleActive,
     deleteUser,
+    changeUserRole,
 } = require('../controllers/userController');
 
 // Modèle User (nécessaire pour la route /auditors)
@@ -25,6 +26,7 @@ router.get('/', protect, admin('admin', 'superAdmin'), getAllUsers);
 router.put('/:id', protect, admin('admin', 'superAdmin'), updateUser);
 router.patch('/:id/toggle-active', protect, admin('admin', 'superAdmin'), toggleActive);
 router.delete('/:id', protect, admin('superAdmin'), deleteUser);
+router.patch('/:id/change-role', protect, admin('superAdmin'), changeUserRole);
 
 // ────────────────────────────────────────────────────────────────
 // Route d'inscription (généralement accessible sans authentification)

@@ -334,11 +334,12 @@ const ChatBox = ({ taskId = null }) => {
           ) : (
             <>
               {messages.map((msg) => {
-                const isUser = msg.sender._id === user.id;
-                const roleClass = msg.sender.role === 'superAdmin' ? 'role-superAdmin' : 
-                                msg.sender.role === 'admin' ? 'role-admin' : 'role-user';
-                const roleText = msg.sender.role === 'superAdmin' ? 'SUPER ADMIN' : 
-                               msg.sender.role === 'admin' ? 'ADMIN' : 'MEMBRE';
+                const sender = msg.sender || { _id: null, name: 'Système', role: 'user' };
+                const isUser = sender._id === user.id;
+                const roleClass = sender.role === 'superAdmin' ? 'role-superAdmin' : 
+                                sender.role === 'admin' ? 'role-admin' : 'role-user';
+                const roleText = sender.role === 'superAdmin' ? 'SUPER ADMIN' : 
+                               sender.role === 'admin' ? 'ADMIN' : 'MEMBRE';
                 
                 return (
                   <div
@@ -347,9 +348,9 @@ const ChatBox = ({ taskId = null }) => {
                   >
                     <div className={`message-bubble ${isUser ? 'user' : 'other'}`}>
                       <div className="message-header">
-                        <span>{getMessageEmoji(msg.sender.role, msg.content)}</span>
+                        <span>{getMessageEmoji(sender.role, msg.content)}</span>
                         <span className="message-sender">
-                          {isUser ? 'Vous' : msg.sender.name}
+                          {isUser ? 'Vous' : sender.name}
                         </span>
                         {!isUser && (
                           <span className={`message-role ${roleClass}`}>
